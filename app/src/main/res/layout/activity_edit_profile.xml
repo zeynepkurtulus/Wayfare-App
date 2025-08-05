@@ -1,0 +1,444 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_light"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:elevation="4dp"
+            android:orientation="horizontal"
+            android:paddingVertical="16dp"
+            android:paddingHorizontal="20dp"
+            android:gravity="center_vertical">
+
+            <ImageButton
+                android:id="@+id/backButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/back_button"
+                android:src="@drawable/ic_arrow_back"
+                app:tint="@color/text_primary" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/edit_profile"
+                android:textColor="@color/text_primary"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:gravity="center" />
+
+            <View
+                android:layout_width="40dp"
+                android:layout_height="40dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Personal Information Section -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/personal_information"
+                        android:textColor="@color/text_primary"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="16dp" />
+
+                    <!-- First Name -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        android:hint="@string/first_name"
+                        app:boxBackgroundMode="filled"
+                        app:boxBackgroundColor="@color/input_background"
+                        app:boxStrokeColor="@color/primary"
+                        app:boxStrokeWidthFocused="2dp"
+                        app:hintTextColor="@color/text_hint">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/firstNameEditText"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="textPersonName"
+                            android:textColor="@color/text_primary"
+                            android:textSize="16sp"
+                            android:paddingVertical="14dp" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <!-- Last Name -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        android:hint="@string/last_name"
+                        app:boxBackgroundMode="filled"
+                        app:boxBackgroundColor="@color/input_background"
+                        app:boxStrokeColor="@color/primary"
+                        app:boxStrokeWidthFocused="2dp"
+                        app:hintTextColor="@color/text_hint">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/lastNameEditText"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="textPersonName"
+                            android:textColor="@color/text_primary"
+                            android:textSize="16sp"
+                            android:paddingVertical="14dp" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <!-- Home City -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/home_city"
+                        app:boxBackgroundMode="filled"
+                        app:boxBackgroundColor="@color/input_background"
+                        app:boxStrokeColor="@color/primary"
+                        app:boxStrokeWidthFocused="2dp"
+                        app:hintTextColor="@color/text_hint">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/homeCityEditText"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="text"
+                            android:textColor="@color/text_primary"
+                            android:textSize="16sp"
+
+                            android:paddingVertical="14dp" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Travel Preferences Section -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/travel_preferences"
+                        android:textColor="@color/text_primary"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="16dp" />
+
+                    <!-- Budget Preference -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/budget_preference"
+                        android:textColor="@color/text_primary"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="8dp" />
+
+                    <RadioGroup
+                        android:id="@+id/budgetRadioGroup"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        android:orientation="horizontal">
+
+                        <RadioButton
+                            android:id="@+id/budgetLowRadio"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/budget_low"
+                            android:textColor="@color/text_primary"
+                            android:buttonTint="@color/primary" />
+
+                        <RadioButton
+                            android:id="@+id/budgetMediumRadio"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/budget_medium"
+                            android:textColor="@color/text_primary"
+                            android:buttonTint="@color/primary" />
+
+                        <RadioButton
+                            android:id="@+id/budgetHighRadio"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/budget_high"
+                            android:textColor="@color/text_primary"
+                            android:buttonTint="@color/primary" />
+
+                    </RadioGroup>
+
+                    <!-- Travel Style -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/travel_style"
+                        android:textColor="@color/text_primary"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="8dp" />
+
+                    <RadioGroup
+                        android:id="@+id/travelStyleRadioGroup"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        android:orientation="vertical">
+
+                        <RadioButton
+                            android:id="@+id/travelStyleRelaxedRadio"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/travel_style_relaxed"
+                            android:textColor="@color/text_primary"
+                            android:buttonTint="@color/primary" />
+
+                        <RadioButton
+                            android:id="@+id/travelStyleModerateRadio"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/travel_style_moderate"
+                            android:textColor="@color/text_primary"
+                            android:buttonTint="@color/primary" />
+
+                        <RadioButton
+                            android:id="@+id/travelStyleAcceleratedRadio"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/travel_style_accelerated"
+                            android:textColor="@color/text_primary"
+                            android:buttonTint="@color/primary" />
+
+                    </RadioGroup>
+
+                    <!-- Interests -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/interests"
+                        android:textColor="@color/text_primary"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="8dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/select_interests"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="14sp"
+                        android:layout_marginBottom="12dp" />
+
+                    <!-- Interests Checkboxes in a Grid -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <CheckBox
+                                android:id="@+id/interestCultureCheckbox"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/interest_culture"
+                                android:textColor="@color/text_primary"
+                                android:buttonTint="@color/primary" />
+
+                            <CheckBox
+                                android:id="@+id/interestHistoryCheckbox"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/interest_history"
+                                android:textColor="@color/text_primary"
+                                android:buttonTint="@color/primary" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <CheckBox
+                                android:id="@+id/interestFoodCheckbox"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/interest_food"
+                                android:textColor="@color/text_primary"
+                                android:buttonTint="@color/primary" />
+
+                            <CheckBox
+                                android:id="@+id/interestAdventureCheckbox"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/interest_adventure"
+                                android:textColor="@color/text_primary"
+                                android:buttonTint="@color/primary" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <CheckBox
+                                android:id="@+id/interestNatureCheckbox"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/interest_nature"
+                                android:textColor="@color/text_primary"
+                                android:buttonTint="@color/primary" />
+
+                            <CheckBox
+                                android:id="@+id/interestNightlifeCheckbox"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/interest_nightlife"
+                                android:textColor="@color/text_primary"
+                                android:buttonTint="@color/primary" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <CheckBox
+                                android:id="@+id/interestShoppingCheckbox"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/interest_shopping"
+                                android:textColor="@color/text_primary"
+                                android:buttonTint="@color/primary" />
+
+                            <CheckBox
+                                android:id="@+id/interestArtCheckbox"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/interest_art"
+                                android:textColor="@color/text_primary"
+                                android:buttonTint="@color/primary" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <CheckBox
+                                android:id="@+id/interestArchitectureCheckbox"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/interest_architecture"
+                                android:textColor="@color/text_primary"
+                                android:buttonTint="@color/primary" />
+
+                            <CheckBox
+                                android:id="@+id/interestPhotographyCheckbox"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/interest_photography"
+                                android:textColor="@color/text_primary"
+                                android:buttonTint="@color/primary" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Save Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/saveButton"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="@string/save_changes"
+                style="@style/MyCustomButton.Large"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Loading Indicator -->
+            <ProgressBar
+                android:id="@+id/loadingProgressBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="16dp"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- Base config allows all HTTPS traffic and clears some restrictions -->
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system"/>
+        </trust-anchors>
+    </base-config>
+    
+    <domain-config cleartextTrafficPermitted="true">
+        <!-- Allow HTTP traffic to localhost for development -->
+        <domain includeSubdomains="true">localhost</domain>
+        <domain includeSubdomains="true">10.0.2.2</domain> <!-- Android emulator host -->
+        <domain includeSubdomains="true">127.0.0.1</domain>
+    </domain-config>
+    
+    <!-- Allow HTTPS traffic to external domains for images -->
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">dynamic-media-cdn.tripadvisor.com</domain>
+        <domain includeSubdomains="true">media-cdn.tripadvisor.com</domain>
+        <domain includeSubdomains="true">tripadvisor.com</domain>
+        <domain includeSubdomains="true">static.tacdn.com</domain>
+        <trust-anchors>
+            <certificates src="system"/>
+        </trust-anchors>
+    </domain-config>
+</network-security-config>

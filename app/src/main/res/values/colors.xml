@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    
+    <!-- Wayfare App Colors -->
+    <color name="primary">#0D6EFD</color>
+    <color name="primary_light">#E3F2FD</color>
+    <color name="primary_dark">#0B5CDB</color>
+    <color name="accent">#6BAFFE</color>
+    
+    <!-- New Login Screen Colors -->
+    <color name="background_light">#FAFAFA</color>
+    <color name="text_primary">#1A1A1A</color>
+    <color name="text_secondary">#333446</color>
+    <color name="text_hint">#9CA3AF</color>
+    <color name="input_background">#F3F4F6</color>
+    <color name="button_primary">#0D6EFD</color>
+    <color name="back_button_background">#F0F0F0</color>
+    <color name="primary_blue_500">#0D6EFD</color>
+    <color name="primary_blue_700">#0B5CDB</color>
+    
+    <!-- Additional colors for login form -->
+    <color name="grey_200">#6B7280</color>
+    <color name="grey_300">#D1D5DB</color>
+    <color name="grey_400">#D7D7D7</color>
+    <color name="input_stroke">#B3D4FF</color>
+    <color name="transparent">#00000000</color>
+    <color name="input_fields_filling">#D9D9D9</color>
+    
+    <!-- Dialog colors -->
+    <color name="success_green">#22C55E</color>
+    <color name="error_red">#EF4444</color>
+    <color name="warning_orange">#F59E0B</color>
+    <color name="orange_accent">#FF6B35</color>
+    
+    <!-- Navigation colors -->
+    <color name="nav_icon_inactive">#9CA3AF</color>
+    <color name="nav_text_inactive">#6B7280</color>
+    
+    <!-- Dialog colors -->
+    <color name="dialog_border">#E5E7EB</color>
+</resources>
