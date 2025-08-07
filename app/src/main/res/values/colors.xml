@@ -45,4 +45,10 @@
     
     <!-- Dialog colors -->
     <color name="dialog_border">#E5E7EB</color>
+    
+    <!-- Additional colors for trip detail -->
+    <color name="border_light">#E5E7EB</color>
+    <color name="star_yellow">#FFC107</color>
+    <color name="travel_mode_unselected">#D4F6FF</color>
+
 </resources>

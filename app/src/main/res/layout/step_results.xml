@@ -271,13 +271,14 @@
             android:padding="16dp">
 
             <!-- Trip Image -->
-            <ImageView
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/resultsTripImageView"
                 android:layout_width="80dp"
                 android:layout_height="80dp"
                 android:src="@drawable/ic_place_placeholder"
                 android:scaleType="centerCrop"
-                android:background="@drawable/card_gradient_overlay"
-                app:tint="@color/primary"
+                app:civ_border_width="2dp"
+                app:civ_border_color="@color/primary"
                 android:layout_marginEnd="16dp" />
 
             <!-- Trip Info -->

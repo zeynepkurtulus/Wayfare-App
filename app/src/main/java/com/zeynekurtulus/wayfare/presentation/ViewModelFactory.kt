@@ -24,7 +24,8 @@ class ViewModelFactory(
     private val placeRepository: PlaceRepository,
     private val locationRepository: LocationRepository,
     private val feedbackRepository: FeedbackRepository,
-    private val cityRepository: CityRepository
+    private val cityRepository: CityRepository,
+    private val mustVisitRepository: MustVisitRepository
 ) : ViewModelProvider.Factory {
     
     @Suppress("UNCHECKED_CAST")
@@ -33,7 +34,7 @@ class ViewModelFactory(
             LoginViewModel::class.java -> LoginViewModel(userRepository) as T
             RegisterViewModel::class.java -> RegisterViewModel(userRepository) as T
             SignUpViewModel::class.java -> SignUpViewModel(userRepository) as T
-            TripMakerViewModel::class.java -> TripMakerViewModel(cityRepository, routeRepository) as T
+            TripMakerViewModel::class.java -> TripMakerViewModel(cityRepository, routeRepository, mustVisitRepository, userRepository) as T
             OtpVerificationViewModel::class.java -> OtpVerificationViewModel(userRepository) as T
             UserProfileViewModel::class.java -> UserProfileViewModel(userRepository) as T
             RouteListViewModel::class.java -> RouteListViewModel(routeRepository) as T

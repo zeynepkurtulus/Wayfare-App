@@ -50,6 +50,10 @@ class AppContainer(private val context: Context) {
         NetworkConfig.createCityApiService(retrofit)
     }
     
+    private val mustVisitApiService: MustVisitApiService by lazy {
+        NetworkConfig.createMustVisitApiService(retrofit)
+    }
+    
     // Repository implementations
     val userRepository: UserRepository by lazy {
         UserRepositoryImpl(userApiService, sharedPreferencesManager)
@@ -75,6 +79,10 @@ class AppContainer(private val context: Context) {
         CityRepositoryImpl(cityApiService, sharedPreferencesManager)
     }
     
+    val mustVisitRepository: MustVisitRepository by lazy {
+        MustVisitRepositoryImpl(mustVisitApiService)
+    }
+    
     // ViewModelFactory
     val viewModelFactory: ViewModelFactory by lazy {
         ViewModelFactory(
@@ -83,7 +91,8 @@ class AppContainer(private val context: Context) {
             placeRepository = placeRepository,
             locationRepository = locationRepository,
             feedbackRepository = feedbackRepository,
-            cityRepository = cityRepository
+            cityRepository = cityRepository,
+            mustVisitRepository = mustVisitRepository
         )
     }
 }

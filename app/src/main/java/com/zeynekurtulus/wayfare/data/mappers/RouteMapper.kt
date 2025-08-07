@@ -12,7 +12,8 @@ object RouteMapper {
             startDate = createRoute.startDate,
             endDate = createRoute.endDate,
             category = createRoute.category,
-            season = createRoute.season
+            season = createRoute.season,
+            mustVisit = createRoute.mustVisit.map { mapToMustVisitPlaceDto(it) }
         )
     }
     

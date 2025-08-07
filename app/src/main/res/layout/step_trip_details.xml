@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/tripDetailsScrollView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:fillViewport="true">
 
 <LinearLayout
+    android:id="@+id/tripDetailsMainContainer"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
@@ -46,6 +48,7 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/tripDetailsTitleText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Trip to Rome"
@@ -55,6 +58,7 @@
                     android:layout_marginBottom="4dp" />
 
                 <TextView
+                    android:id="@+id/tripDetailsDatesText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="June 1-7, 2025"
@@ -62,19 +66,7 @@
                     android:textSize="14sp" />
 
             </LinearLayout>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/tripDetailsSaveButton"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:text="Save Trip"
-                android:textColor="@color/primary"
-                android:textSize="12sp"
-                app:strokeColor="@color/primary"
-                app:cornerRadius="20dp"
-                android:paddingHorizontal="16dp" />
-
+            
         </LinearLayout>
 
     </LinearLayout>
@@ -124,6 +116,7 @@
                         android:textSize="12sp" />
 
                     <TextView
+                        android:id="@+id/tripDetailsDurationText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="7 Days"
@@ -148,6 +141,7 @@
                         android:textSize="12sp" />
 
                     <TextView
+                        android:id="@+id/tripDetailsActivitiesText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="18 Places"
@@ -171,6 +165,7 @@
                         android:textSize="12sp" />
 
                     <TextView
+                        android:id="@+id/tripDetailsBudgetText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="$100-200/day"
@@ -280,7 +275,6 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="10:00 AM"
                             android:textColor="@color/primary"
                             android:textSize="12sp"
                             android:textStyle="bold"
@@ -289,7 +283,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Visit the Colosseum"
+
                             android:textColor="@color/text_primary"
                             android:textSize="14sp"
                             android:textStyle="bold"
@@ -298,7 +292,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Explore the ancient amphitheater and learn about Roman history"
+
                             android:textColor="@color/text_secondary"
                             android:textSize="12sp"
                             android:lineSpacingExtra="2dp" />
@@ -345,7 +339,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="12:00 PM"
+
                             android:textColor="@color/primary"
                             android:textSize="12sp"
                             android:textStyle="bold"
@@ -354,7 +348,6 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Lunch at Trattoria"
                             android:textColor="@color/text_primary"
                             android:textSize="14sp"
                             android:textStyle="bold"
@@ -363,7 +356,6 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Traditional Italian cuisine in the heart of Rome"
                             android:textColor="@color/text_secondary"
                             android:textSize="12sp"
                             android:lineSpacingExtra="2dp" />

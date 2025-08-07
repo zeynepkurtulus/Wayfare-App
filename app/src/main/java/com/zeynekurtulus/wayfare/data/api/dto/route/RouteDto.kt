@@ -9,7 +9,8 @@ data class CreateRouteRequest(
     @SerializedName("start_date") val startDate: String,
     @SerializedName("end_date") val endDate: String,
     @SerializedName("category") val category: String,
-    @SerializedName("season") val season: String
+    @SerializedName("season") val season: String,
+    @SerializedName("must_visit") val mustVisit: List<MustVisitPlaceDto>
 )
 
 data class UpdateRouteRequest(

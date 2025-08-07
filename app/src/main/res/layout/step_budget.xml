@@ -156,7 +156,7 @@
             android:foreground="?attr/selectableItemBackground"
             app:cardCornerRadius="16dp"
             app:cardElevation="4dp"
-            app:cardBackgroundColor="@color/primary_blue_700"
+            app:cardBackgroundColor="@color/white"
             app:cardUseCompatPadding="true">
 
             <LinearLayout

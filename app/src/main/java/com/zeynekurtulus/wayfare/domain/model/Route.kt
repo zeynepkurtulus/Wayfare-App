@@ -92,7 +92,8 @@ data class CreateRoute(
     val startDate: String,
     val endDate: String,
     val category: String,
-    val season: String
+    val season: String,
+    val mustVisit: List<MustVisitPlace> = emptyList()
 )
 
 data class UpdateRoute(

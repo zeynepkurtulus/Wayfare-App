@@ -98,7 +98,7 @@
             android:layout_marginBottom="16dp"
             android:clickable="true"
             android:focusable="true"
-            app:cardBackgroundColor="#C0D6E8"
+            app:cardBackgroundColor="#D4F6FF"
             android:foreground="?attr/selectableItemBackground">
 
             <LinearLayout
@@ -168,7 +168,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Moderate"
-                    android:textColor="@android:color/white"
+                    android:textColor="@android:color/black"
                     android:textSize="18sp"
                     android:textStyle="bold"
                     android:layout_marginBottom="8dp" />
@@ -177,7 +177,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Balanced pace with a good mix of activities and rest time"
-                    android:textColor="@android:color/white"
+                    android:textColor="@android:color/black"
                     android:textSize="14sp"
                     android:textAlignment="center"
                     android:lineSpacingExtra="4dp" />

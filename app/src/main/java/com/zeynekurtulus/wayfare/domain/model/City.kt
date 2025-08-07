@@ -27,6 +27,9 @@ data class TripCreationData(
     var endDate: String? = null,
     var category: String? = null,
     var season: String? = null,
+    var interests: List<String> = emptyList(),
+    var budget: String? = null,
+    var travelStyle: String? = null,
     var title: String? = null
 ) : Parcelable
 
@@ -54,5 +57,19 @@ object TripConstants {
         SeasonOption("summer", "Summer (Jun-Aug)"),
         SeasonOption("autumn", "Autumn (Sep-Nov)"),
         SeasonOption("winter", "Winter (Dec-Feb)")
+    )
+    
+    val BUDGETS = listOf(
+        CategoryOption("budget", "Budget (Under $50/day)"),
+        CategoryOption("mid_range", "Mid-range ($50-150/day)"),
+        CategoryOption("luxury", "Luxury ($150+/day)")
+    )
+    
+    val TRAVEL_STYLES = listOf(
+        CategoryOption("solo", "Solo Traveler"),
+        CategoryOption("couple", "Couple"),
+        CategoryOption("family", "Family"),
+        CategoryOption("group", "Group/Friends"),
+        CategoryOption("business", "Business")
     )
 }

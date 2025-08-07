@@ -57,4 +57,8 @@ object NetworkConfig {
     fun createCityApiService(retrofit: Retrofit): CityApiService {
         return retrofit.create(CityApiService::class.java)
     }
+    
+    fun createMustVisitApiService(retrofit: Retrofit): MustVisitApiService {
+        return retrofit.create(MustVisitApiService::class.java)
+    }
 }

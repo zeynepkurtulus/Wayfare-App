@@ -14,14 +14,17 @@
         <domain includeSubdomains="true">127.0.0.1</domain>
     </domain-config>
     
-    <!-- Allow HTTPS traffic to external domains for images -->
-    <domain-config cleartextTrafficPermitted="false">
+    <!-- Allow HTTPS traffic to external domains for images with relaxed SSL validation -->
+    <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">dynamic-media-cdn.tripadvisor.com</domain>
         <domain includeSubdomains="true">media-cdn.tripadvisor.com</domain>
         <domain includeSubdomains="true">tripadvisor.com</domain>
         <domain includeSubdomains="true">static.tacdn.com</domain>
+        <domain includeSubdomains="true">res.cloudinary.com</domain>
+        <domain includeSubdomains="true">lh3.googleusercontent.com</domain>
         <trust-anchors>
             <certificates src="system"/>
+            <certificates src="user"/>
         </trust-anchors>
     </domain-config>
 </network-security-config>
