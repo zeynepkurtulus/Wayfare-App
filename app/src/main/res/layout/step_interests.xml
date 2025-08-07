@@ -168,11 +168,11 @@
                         android:layout_marginBottom="12dp">
 
                         <com.google.android.material.chip.Chip
-                            android:id="@+id/chipFoodDrink"
+                            android:id="@+id/chipMajorMuseums"
                             style="@style/Widget.MaterialComponents.Chip.Choice"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="🍽️ Food and Drink"
+                            android:text="🏛️ Major Museums"
                             android:textSize="12sp"
                             android:layout_marginEnd="8dp"
                             android:textColor="@color/white"
@@ -180,11 +180,11 @@
                             app:chipBackgroundColor="@color/primary_blue_700" />
 
                         <com.google.android.material.chip.Chip
-                            android:id="@+id/chipOutdoors"
+                            android:id="@+id/chipThemeParks"
                             style="@style/Widget.MaterialComponents.Chip.Choice"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="🌲 Outdoors"
+                            android:text="🎡 Theme Parks"
                             android:textSize="12sp"
                             android:layout_marginEnd="8dp"
                             app:chipBackgroundColor="@color/grey_300" />
@@ -199,11 +199,11 @@
                         android:layout_marginBottom="12dp">
 
                         <com.google.android.material.chip.Chip
-                            android:id="@+id/chipHiddenGems"
+                            android:id="@+id/chipParksNature"
                             style="@style/Widget.MaterialComponents.Chip.Choice"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="💎 Hidden Gems"
+                            android:text="🌿 Parks &amp; Nature"
                             android:textSize="12sp"
                             android:layout_marginEnd="8dp"
                             android:checked="true"
@@ -211,11 +211,11 @@
                             app:chipBackgroundColor="@color/primary_blue_700" />
 
                         <com.google.android.material.chip.Chip
-                            android:id="@+id/chipFamilyFriendly"
+                            android:id="@+id/chipZoosAquariums"
                             style="@style/Widget.MaterialComponents.Chip.Choice"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="👨‍👩‍👧‍👦 Family Friendly"
+                            android:text="🐟 Zoos &amp; Aquariums"
                             android:textSize="12sp"
                             android:layout_marginEnd="8dp"
                             app:chipBackgroundColor="@color/grey_300" />
@@ -230,21 +230,21 @@
                         android:layout_marginBottom="12dp">
 
                         <com.google.android.material.chip.Chip
-                            android:id="@+id/chipNightlife"
+                            android:id="@+id/chipSportsRecreation"
                             style="@style/Widget.MaterialComponents.Chip.Choice"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="🌃 Nightlife"
+                            android:text="⚽ Sports &amp; Recreation"
                             android:textSize="12sp"
                             android:layout_marginEnd="8dp"
                             app:chipBackgroundColor="@color/grey_300" />
 
                         <com.google.android.material.chip.Chip
-                            android:id="@+id/chipShopping"
+                            android:id="@+id/chipEntertainment"
                             style="@style/Widget.MaterialComponents.Chip.Choice"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="🛍️ Shopping"
+                            android:text="🎭 Entertainment"
                             android:textSize="12sp"
                             android:layout_marginEnd="8dp"
                             app:chipBackgroundColor="@color/grey_300" />
@@ -259,21 +259,21 @@
                         android:layout_marginBottom="12dp">
 
                         <com.google.android.material.chip.Chip
-                            android:id="@+id/chipHistorical"
+                            android:id="@+id/chipWellnessRelaxation"
                             style="@style/Widget.MaterialComponents.Chip.Choice"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="🏰 Historical Sites"
+                            android:text="🧘 Wellness &amp; Relaxation"
                             android:textSize="12sp"
                             android:layout_marginEnd="8dp"
                             app:chipBackgroundColor="@color/grey_300" />
 
                         <com.google.android.material.chip.Chip
-                            android:id="@+id/chipBeaches"
+                            android:id="@+id/chipCulturalSites"
                             style="@style/Widget.MaterialComponents.Chip.Choice"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="🏖️ Beaches"
+                            android:text="🏰 Cultural Sites"
                             android:textSize="12sp"
                             android:layout_marginEnd="8dp"
                             app:chipBackgroundColor="@color/grey_300" />
@@ -288,21 +288,21 @@
                         android:layout_marginBottom="12dp">
 
                         <com.google.android.material.chip.Chip
-                            android:id="@+id/chipAdventure"
+                            android:id="@+id/chipReligiousSites"
                             style="@style/Widget.MaterialComponents.Chip.Choice"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="🏔️ Adventure Sports"
+                            android:text="⛪ Religious Sites"
                             android:textSize="12sp"
                             android:layout_marginEnd="8dp"
                             app:chipBackgroundColor="@color/grey_300" />
 
                         <com.google.android.material.chip.Chip
-                            android:id="@+id/chipWellness"
+                            android:id="@+id/chipShoppingMarkets"
                             style="@style/Widget.MaterialComponents.Chip.Choice"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="🧘 Wellness &amp; Spa"
+                            android:text="🛍️ Shopping &amp; Markets"
                             android:textSize="12sp"
                             android:layout_marginEnd="8dp"
                             app:chipBackgroundColor="@color/grey_300" />
@@ -317,21 +317,21 @@
                         android:layout_marginBottom="12dp">
 
                         <com.google.android.material.chip.Chip
-                            android:id="@+id/chipArchitecture"
+                            android:id="@+id/chipToursActivities"
                             style="@style/Widget.MaterialComponents.Chip.Choice"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="🏗️ Architecture"
+                            android:text="🚁 Tours &amp; Activities"
                             android:textSize="12sp"
                             android:layout_marginEnd="8dp"
                             app:chipBackgroundColor="@color/grey_300" />
 
                         <com.google.android.material.chip.Chip
-                            android:id="@+id/chipMusic"
+                            android:id="@+id/chipLandmarksMonuments"
                             style="@style/Widget.MaterialComponents.Chip.Choice"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="🎵 Music and Theater"
+                            android:text="🗽 Landmarks &amp; Monuments"
                             android:textSize="12sp"
                             android:layout_marginEnd="8dp"
                             app:chipBackgroundColor="@color/grey_300" />
@@ -345,21 +345,21 @@
                         android:orientation="horizontal">
 
                         <com.google.android.material.chip.Chip
-                            android:id="@+id/chipLocalCulture"
+                            android:id="@+id/chipTransportation"
                             style="@style/Widget.MaterialComponents.Chip.Choice"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="🎭 Local Culture"
+                            android:text="🚊 Transportation"
                             android:textSize="12sp"
                             android:layout_marginEnd="8dp"
                             app:chipBackgroundColor="@color/grey_300" />
 
                         <com.google.android.material.chip.Chip
-                            android:id="@+id/chipPhotography"
+                            android:id="@+id/chipOther"
                             style="@style/Widget.MaterialComponents.Chip.Choice"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="📸 Photography"
+                            android:text="🌟 Other"
                             android:textSize="12sp"
                             android:layout_marginEnd="8dp"
                             app:chipBackgroundColor="@color/grey_300" />

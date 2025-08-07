@@ -1029,28 +1029,29 @@ class TripMakerFragment : Fragment() {
         val nextButton = binding.interestsStep.root.findViewById<Button>(R.id.interestsNextButton)
         val backButton = binding.interestsStep.root.findViewById<Button>(R.id.interestsBackButton)
         
-        // Set up interest chip selection (using existing chips from layout)
+        // Set up interest chip selection (using new category mapping chips)
         val chipMuseums = binding.interestsStep.root.findViewById<Chip>(R.id.chipMuseums)
-        val chipFoodDrink = binding.interestsStep.root.findViewById<Chip>(R.id.chipFoodDrink)
-        val chipOutdoors = binding.interestsStep.root.findViewById<Chip>(R.id.chipOutdoors)
-        val chipHiddenGems = binding.interestsStep.root.findViewById<Chip>(R.id.chipHiddenGems)
-        val chipFamilyFriendly = binding.interestsStep.root.findViewById<Chip>(R.id.chipFamilyFriendly)
-        val chipNightlife = binding.interestsStep.root.findViewById<Chip>(R.id.chipNightlife)
-        val chipShopping = binding.interestsStep.root.findViewById<Chip>(R.id.chipShopping)
-        val chipHistorical = binding.interestsStep.root.findViewById<Chip>(R.id.chipHistorical)
-        val chipBeaches = binding.interestsStep.root.findViewById<Chip>(R.id.chipBeaches)
-        val chipAdventure = binding.interestsStep.root.findViewById<Chip>(R.id.chipAdventure)
-        val chipWellness = binding.interestsStep.root.findViewById<Chip>(R.id.chipWellness)
-        val chipArchitecture = binding.interestsStep.root.findViewById<Chip>(R.id.chipArchitecture)
-        val chipMusic = binding.interestsStep.root.findViewById<Chip>(R.id.chipMusic)
-        val chipLocalCulture = binding.interestsStep.root.findViewById<Chip>(R.id.chipLocalCulture)
-        val chipPhotography = binding.interestsStep.root.findViewById<Chip>(R.id.chipPhotography)
+        val chipMajorMuseums = binding.interestsStep.root.findViewById<Chip>(R.id.chipMajorMuseums)
+        val chipThemeParks = binding.interestsStep.root.findViewById<Chip>(R.id.chipThemeParks)
+        val chipParksNature = binding.interestsStep.root.findViewById<Chip>(R.id.chipParksNature)
+        val chipZoosAquariums = binding.interestsStep.root.findViewById<Chip>(R.id.chipZoosAquariums)
+        val chipSportsRecreation = binding.interestsStep.root.findViewById<Chip>(R.id.chipSportsRecreation)
+        val chipEntertainment = binding.interestsStep.root.findViewById<Chip>(R.id.chipEntertainment)
+        val chipWellnessRelaxation = binding.interestsStep.root.findViewById<Chip>(R.id.chipWellnessRelaxation)
+        val chipCulturalSites = binding.interestsStep.root.findViewById<Chip>(R.id.chipCulturalSites)
+        val chipReligiousSites = binding.interestsStep.root.findViewById<Chip>(R.id.chipReligiousSites)
+        val chipShoppingMarkets = binding.interestsStep.root.findViewById<Chip>(R.id.chipShoppingMarkets)
+        val chipToursActivities = binding.interestsStep.root.findViewById<Chip>(R.id.chipToursActivities)
+        val chipLandmarksMonuments = binding.interestsStep.root.findViewById<Chip>(R.id.chipLandmarksMonuments)
+        val chipTransportation = binding.interestsStep.root.findViewById<Chip>(R.id.chipTransportation)
+        val chipOther = binding.interestsStep.root.findViewById<Chip>(R.id.chipOther)
         
         // Set up chip click listeners to collect selected interests
         val chips = listOf(
-            chipMuseums, chipFoodDrink, chipOutdoors, chipHiddenGems, chipFamilyFriendly,
-            chipNightlife, chipShopping, chipHistorical, chipBeaches, chipAdventure,
-            chipWellness, chipArchitecture, chipMusic, chipLocalCulture, chipPhotography
+            chipMuseums, chipMajorMuseums, chipThemeParks, chipParksNature, chipZoosAquariums,
+            chipSportsRecreation, chipEntertainment, chipWellnessRelaxation, chipCulturalSites,
+            chipReligiousSites, chipShoppingMarkets, chipToursActivities, chipLandmarksMonuments,
+            chipTransportation, chipOther
         )
         
         chips.filterNotNull().forEach { chip ->
@@ -1424,6 +1425,9 @@ class TripMakerFragment : Fragment() {
     private fun loadDailyItinerary(routeDetail: RouteDetail) {
         Log.d("TripMakerFragment", "🗓️ Loading daily itinerary with ${routeDetail.days.size} days")
         
+        // Reset expanded state when loading new trip details
+        expandedDays.clear()
+        
         val tripDetailsRoot = binding.tripDetailsStep.root
         
         // Find the main container directly
@@ -1465,15 +1469,271 @@ class TripMakerFragment : Fragment() {
         
         Log.d("TripMakerFragment", "✅ Cleared existing daily itinerary content")
         
-        // Add dynamic daily itinerary content
-        routeDetail.days.forEachIndexed { dayIndex, routeDay ->
-            Log.d("TripMakerFragment", "Creating day ${dayIndex + 1}: ${routeDay.date} with ${routeDay.activities.size} activities")
+        // Add dynamic daily itinerary content (compact format)
+        if (routeDetail.days.isNotEmpty()) {
+            // Show first day with detailed timeline (like the image)
+            val firstDay = routeDetail.days[0]
+            Log.d("TripMakerFragment", "Creating detailed day 1: ${firstDay.date} with ${firstDay.activities.size} activities")
+            val firstDayCard = createDetailedDayCard(firstDay, 1)
+            mainContainer.addView(firstDayCard)
             
-            val dayCard = createDayCard(routeDay, dayIndex + 1)
-            mainContainer.addView(dayCard)
+            // Show remaining days as compact summary cards
+            if (routeDetail.days.size > 1) {
+                routeDetail.days.drop(1).forEachIndexed { index, routeDay ->
+                    val dayNumber = index + 2
+                    Log.d("TripMakerFragment", "Creating summary day $dayNumber: ${routeDay.date} with ${routeDay.activities.size} activities")
+                    val summaryCard = createSummaryDayCard(routeDay, dayNumber)
+                    mainContainer.addView(summaryCard)
+                }
+            }
+            
+            // Only add "more days" indicator if there are actually hidden days
+            // Since we show Day 1 detailed + all other days as summary cards, 
+            // we don't need this indicator anymore as all days are accessible
+            // Remove this section completely
         }
         
         Log.d("TripMakerFragment", "✅ Daily itinerary loaded successfully")
+    }
+    
+    // Track expanded state for each day card
+    private val expandedDays = mutableSetOf<Int>()
+    
+    private fun createDetailedDayCard(routeDay: RouteDay, dayNumber: Int): View {
+        val context = requireContext()
+        
+        // Create the day card (like the first day in your image)
+        val dayCard = com.google.android.material.card.MaterialCardView(context).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                setMargins(0, 0, 0, 24.dpToPx(context))
+            }
+            radius = 16.dpToPx(context).toFloat()
+            cardElevation = 4.dpToPx(context).toFloat()
+        }
+        
+        // Create the main container
+        val mainContainer = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(20.dpToPx(context), 20.dpToPx(context), 20.dpToPx(context), 20.dpToPx(context))
+        }
+        
+        // Add day header
+        val dayTitle = TextView(context).apply {
+            text = "${formatDate(routeDay.date)} - Day $dayNumber"
+            textSize = 16f
+            setTextColor(ContextCompat.getColor(context, R.color.text_primary))
+            typeface = android.graphics.Typeface.DEFAULT_BOLD
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, 
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                setMargins(0, 0, 0, 16.dpToPx(context))
+            }
+        }
+        mainContainer.addView(dayTitle)
+        
+        // Create activities container (will hold both shown and hidden activities)
+        val activitiesContainer = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            tag = "activities_container_$dayNumber" // For finding later
+        }
+        
+        // Initially show max 2 activities
+        val isExpanded = expandedDays.contains(dayNumber)
+        val activitiesToShow = if (isExpanded) routeDay.activities.size else minOf(2, routeDay.activities.size)
+        
+        routeDay.activities.take(activitiesToShow).forEach { activity ->
+            val activityView = createActivityView(activity, context)
+            activitiesContainer.addView(activityView)
+        }
+        
+        mainContainer.addView(activitiesContainer)
+        
+        // Add "Show More/Less" button if there are more than 2 activities
+        if (routeDay.activities.size > 2) {
+            val toggleButton = TextView(context).apply {
+                text = if (isExpanded) "Show Less" else "Show ${routeDay.activities.size - 2} More Activities"
+                textSize = 12f
+                setTextColor(ContextCompat.getColor(context, R.color.primary))
+                typeface = android.graphics.Typeface.DEFAULT_BOLD
+                setPadding(0, 8.dpToPx(context), 0, 0)
+                setOnClickListener {
+                    toggleDayExpansion(dayNumber, routeDay, activitiesContainer, this, context)
+                }
+            }
+            mainContainer.addView(toggleButton)
+        }
+        
+        dayCard.addView(mainContainer)
+        return dayCard
+    }
+    
+    private fun createSummaryDayCard(routeDay: RouteDay, dayNumber: Int): View {
+        val context = requireContext()
+        
+        // Create compact summary card (like Day 2 in your image)
+        val dayCard = com.google.android.material.card.MaterialCardView(context).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                setMargins(0, 0, 0, 24.dpToPx(context))
+            }
+            radius = 16.dpToPx(context).toFloat()
+            cardElevation = 4.dpToPx(context).toFloat()
+            tag = "summary_day_$dayNumber" // For finding and replacing
+        }
+        
+        // Create horizontal layout
+        val mainContainer = LinearLayout(context).apply {
+            orientation = LinearLayout.HORIZONTAL
+            setPadding(20.dpToPx(context), 20.dpToPx(context), 20.dpToPx(context), 20.dpToPx(context))
+            gravity = android.view.Gravity.CENTER_VERTICAL
+        }
+        
+        // Left side - day info
+        val leftContainer = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+        }
+        
+        // Day title
+        val dayTitle = TextView(context).apply {
+            text = "${formatDate(routeDay.date)} - Day $dayNumber"
+            textSize = 16f
+            setTextColor(ContextCompat.getColor(context, R.color.text_primary))
+            typeface = android.graphics.Typeface.DEFAULT_BOLD
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                setMargins(0, 0, 0, 4.dpToPx(context))
+            }
+        }
+        
+        // Activity summary (like "Vatican Museums • St. Peter's Basilica • Sistine Chapel")
+        val activitySummary = routeDay.activities.take(3).joinToString(" • ") { it.placeName }
+        val summaryText = TextView(context).apply {
+            text = activitySummary
+            textSize = 12f
+            setTextColor(ContextCompat.getColor(context, R.color.text_secondary))
+        }
+        
+        leftContainer.addView(dayTitle)
+        leftContainer.addView(summaryText)
+        mainContainer.addView(leftContainer)
+        
+        // Right side - arrow icon
+        val arrowIcon = ImageView(context).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                24.dpToPx(context),
+                24.dpToPx(context)
+            )
+            setImageResource(R.drawable.ic_arrow_back)
+            rotation = 180f // Make it point right
+            setColorFilter(ContextCompat.getColor(context, R.color.text_hint))
+        }
+        mainContainer.addView(arrowIcon)
+        
+        // Make the entire card clickable to expand
+        dayCard.setOnClickListener {
+            expandSummaryDay(routeDay, dayNumber)
+        }
+        
+        dayCard.addView(mainContainer)
+        return dayCard
+    }
+    
+    private fun createMoreDaysIndicator(remainingDays: Int): View {
+        val context = requireContext()
+        
+        // Create "+ X more days" indicator (like in your image)
+        val indicator = TextView(context).apply {
+            text = "+ $remainingDays more days with amazing activities"
+            textSize = 14f
+            setTextColor(ContextCompat.getColor(context, R.color.primary))
+            typeface = android.graphics.Typeface.DEFAULT_BOLD
+            gravity = android.view.Gravity.CENTER_HORIZONTAL
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                gravity = android.view.Gravity.CENTER_HORIZONTAL
+                setMargins(0, 0, 0, 24.dpToPx(context))
+            }
+            setPadding(8.dpToPx(context), 8.dpToPx(context), 8.dpToPx(context), 8.dpToPx(context))
+            // Create a simple ripple background
+            val typedValue = android.util.TypedValue()
+            context.theme.resolveAttribute(android.R.attr.selectableItemBackground, typedValue, true)
+            if (typedValue.resourceId != 0) {
+                background = ContextCompat.getDrawable(context, typedValue.resourceId)
+            } else {
+                // Fallback if resource is not available
+                setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent))
+            }
+        }
+        
+        return indicator
+    }
+    
+    private fun toggleDayExpansion(
+        dayNumber: Int, 
+        routeDay: RouteDay, 
+        activitiesContainer: LinearLayout, 
+        toggleButton: TextView, 
+        context: android.content.Context
+    ) {
+        val isCurrentlyExpanded = expandedDays.contains(dayNumber)
+        
+        if (isCurrentlyExpanded) {
+            // Collapse: Remove extra activities
+            expandedDays.remove(dayNumber)
+            while (activitiesContainer.childCount > 2) {
+                activitiesContainer.removeViewAt(activitiesContainer.childCount - 1)
+            }
+            toggleButton.text = "Show ${routeDay.activities.size - 2} More Activities"
+            Log.d("TripMakerFragment", "Day $dayNumber collapsed - showing 2/${routeDay.activities.size} activities")
+        } else {
+            // Expand: Add remaining activities
+            expandedDays.add(dayNumber)
+            routeDay.activities.drop(2).forEach { activity ->
+                val activityView = createActivityView(activity, context)
+                activitiesContainer.addView(activityView)
+            }
+            toggleButton.text = "Show Less"
+            Log.d("TripMakerFragment", "Day $dayNumber expanded - showing all ${routeDay.activities.size} activities")
+        }
+    }
+    
+    private fun expandSummaryDay(routeDay: RouteDay, dayNumber: Int) {
+        Log.d("TripMakerFragment", "Summary day $dayNumber clicked - converting to detailed view")
+        
+        // Find the main container and replace this summary card with detailed card
+        val tripDetailsRoot = binding.tripDetailsStep.root
+        val mainContainer = tripDetailsRoot.findViewById<LinearLayout>(R.id.tripDetailsMainContainer)
+        
+        if (mainContainer != null) {
+            // Find the summary card and replace it with detailed card
+            for (i in 0 until mainContainer.childCount) {
+                val child = mainContainer.getChildAt(i)
+                if (child.tag == "summary_day_$dayNumber") {
+                    // Remove the summary card
+                    mainContainer.removeViewAt(i)
+                    
+                    // Create and add detailed card at the same position
+                    expandedDays.add(dayNumber) // Mark as expanded
+                    val detailedCard = createDetailedDayCard(routeDay, dayNumber)
+                    detailedCard.tag = "detailed_day_$dayNumber"
+                    mainContainer.addView(detailedCard, i)
+                    
+                    Log.d("TripMakerFragment", "Replaced summary day $dayNumber with detailed view")
+                    break
+                }
+            }
+        }
     }
     
     private fun createDayCard(routeDay: RouteDay, dayNumber: Int): View {
