@@ -48,15 +48,26 @@ class BottomNavigationHandler(
     
     private fun setupClickListeners() {
         binding.homeTab.setOnClickListener {
+            android.util.Log.d("BottomNavigationHandler", "🏠 HOME TAB CLICKED!")
             switchToTab(NavigationTab.HOME)
         }
         
         binding.calendarTab.setOnClickListener {
+            android.util.Log.d("BottomNavigationHandler", "📅 CALENDAR TAB CLICKED!")
             switchToTab(NavigationTab.CALENDAR)
         }
         
+        // Add a more aggressive click listener approach for search tab
         binding.searchTab.setOnClickListener {
+            android.util.Log.d("BottomNavigationHandler", "🔍 SEARCH TAB CLICKED!")
+            android.util.Log.d("BottomNavigationHandler", "Current tab before: $currentTab")
             switchToTab(NavigationTab.SEARCH)
+        }
+        
+        // Also add click listener to the search tab's children to capture clicks
+        binding.searchTab.setOnTouchListener { _, event ->
+            android.util.Log.d("BottomNavigationHandler", "👆 SEARCH TAB TOUCHED! Action: ${event.action}")
+            false // Don't consume the event
         }
         
         binding.tripMakerTab.setOnClickListener {
@@ -69,7 +80,13 @@ class BottomNavigationHandler(
     }
     
     fun switchToTab(tab: NavigationTab) {
-        if (currentTab == tab) return
+        android.util.Log.d("BottomNavigationHandler", "🚀 switchToTab called with: $tab")
+        android.util.Log.d("BottomNavigationHandler", "Current tab: $currentTab")
+        
+        if (currentTab == tab) {
+            android.util.Log.d("BottomNavigationHandler", "⚠️ Same tab selected, returning early")
+            return
+        }
         
         val fragment = when (tab) {
             NavigationTab.HOME -> {
@@ -85,8 +102,12 @@ class BottomNavigationHandler(
                 calendarFragment!!
             }
             NavigationTab.SEARCH -> {
+                android.util.Log.d("BottomNavigationHandler", "🔍 Creating/Getting SearchFragment")
                 if (searchFragment == null) {
+                    android.util.Log.d("BottomNavigationHandler", "✨ Creating NEW SearchFragment instance")
                     searchFragment = SearchFragment()
+                } else {
+                    android.util.Log.d("BottomNavigationHandler", "♻️ Reusing existing SearchFragment")
                 }
                 searchFragment!!
             }
@@ -105,13 +126,22 @@ class BottomNavigationHandler(
         }
         
         // Switch fragment
-        fragmentManager.beginTransaction()
+        android.util.Log.d("BottomNavigationHandler", "📱 Starting fragment transaction for: $tab")
+        android.util.Log.d("BottomNavigationHandler", "Fragment instance: ${fragment::class.java.simpleName}")
+        android.util.Log.d("BottomNavigationHandler", "Container ID: $fragmentContainerId")
+        
+        val transaction = fragmentManager.beginTransaction()
             .replace(fragmentContainerId, fragment, tab.name)
-            .commit()
+        
+        android.util.Log.d("BottomNavigationHandler", "🔄 Committing transaction...")
+        transaction.commit()
+        android.util.Log.d("BottomNavigationHandler", "✅ Transaction committed")
         
         // Update visual state
+        android.util.Log.d("BottomNavigationHandler", "🎨 Updating tab selection...")
         updateTabSelection(tab)
         currentTab = tab
+        android.util.Log.d("BottomNavigationHandler", "🏁 Tab switch complete! New current tab: $currentTab")
     }
     
     private fun updateTabSelection(selectedTab: NavigationTab) {

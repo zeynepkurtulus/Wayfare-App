@@ -53,18 +53,22 @@ class SearchFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        Log.d("SearchFragment", "🔍 onCreateView called - Creating SearchFragment UI")
         _binding = FragmentSearchBinding.inflate(inflater, container, false)
+        Log.d("SearchFragment", "✅ SearchFragment layout inflated successfully")
         return binding.root
     }
     
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         
+        Log.d("SearchFragment", "✅ onViewCreated called - Setting up SearchFragment")
         setupRecyclerView()
         setupSearchInput()
         setupFilters()
         setupObservers()
         showEmptyState()
+        Log.d("SearchFragment", "🎉 SearchFragment setup complete!")
     }
     
     private fun setupRecyclerView() {
@@ -305,8 +309,24 @@ class SearchFragment : Fragment() {
         Log.d("SearchFragment", "Navigating to route details: ${route.title}")
     }
     
+    override fun onAttach(context: android.content.Context) {
+        super.onAttach(context)
+        Log.d("SearchFragment", "🔗 SearchFragment onAttach called")
+    }
+    
+    override fun onResume() {
+        super.onResume()
+        Log.d("SearchFragment", "▶️ SearchFragment onResume called - Fragment is now visible")
+    }
+    
+    override fun onPause() {
+        super.onPause()
+        Log.d("SearchFragment", "⏸️ SearchFragment onPause called")
+    }
+    
     override fun onDestroyView() {
         super.onDestroyView()
+        Log.d("SearchFragment", "💀 SearchFragment onDestroyView called")
         searchJob?.cancel()
         _binding = null
     }

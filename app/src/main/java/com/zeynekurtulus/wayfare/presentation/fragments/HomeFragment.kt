@@ -14,6 +14,8 @@ import com.zeynekurtulus.wayfare.domain.model.Route
 import com.zeynekurtulus.wayfare.domain.model.TopRatedPlace
 import com.zeynekurtulus.wayfare.presentation.activities.Destination
 import com.zeynekurtulus.wayfare.presentation.activities.Trip
+import com.zeynekurtulus.wayfare.presentation.fragments.DestinationDetailsFragment
+import com.zeynekurtulus.wayfare.presentation.fragments.TripDetailsFragment
 import com.zeynekurtulus.wayfare.presentation.adapters.DestinationsAdapter
 import com.zeynekurtulus.wayfare.presentation.adapters.TripsAdapter
 import com.zeynekurtulus.wayfare.presentation.navigation.BottomNavigationHandler.NavigationTab
@@ -65,6 +67,9 @@ class HomeFragment : Fragment() {
     // Adapters
     private lateinit var tripsAdapter: TripsAdapter
     private var userRoutes = listOf<Route>()
+    
+    // Store original data for navigation
+    private var topRatedPlaces = listOf<TopRatedPlace>()
     
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -153,13 +158,38 @@ class HomeFragment : Fragment() {
     }
     
     private fun onDestinationClicked(destination: Destination) {
-        showToast("Opening ${destination.name}")
-        // TODO: Navigate to destination details
+        Log.d("HomeFragment", "🎯 Destination clicked: ${destination.name}")
+        
+        // Find the original TopRatedPlace by matching the name
+        val originalPlace = topRatedPlaces.find { place ->
+            val expectedName = "${place.name}, ${place.city}"
+            expectedName == destination.name
+        }
+        
+        if (originalPlace != null) {
+            Log.d("HomeFragment", "✅ Found matching TopRatedPlace: ${originalPlace.name}")
+            navigateToDestinationDetails(originalPlace)
+        } else {
+            Log.e("HomeFragment", "❌ Could not find matching TopRatedPlace for: ${destination.name}")
+            showToast("Unable to load destination details")
+        }
     }
     
     private fun onTripClicked(trip: Trip) {
-        showToast("Opening ${trip.name}")
-        // TODO: Navigate to trip details
+        Log.d("HomeFragment", "🧳 Trip clicked: ${trip.name}")
+        
+        // Find the original Route by matching the title
+        val originalRoute = userRoutes.find { route ->
+            route.title == trip.name
+        }
+        
+        if (originalRoute != null) {
+            Log.d("HomeFragment", "✅ Found matching Route: ${originalRoute.title}")
+            navigateToTripDetails(originalRoute)
+        } else {
+            Log.e("HomeFragment", "❌ Could not find matching Route for: ${trip.name}")
+            showToast("Unable to load trip details")
+        }
     }
     
     private fun setupObservers() {
@@ -204,9 +234,10 @@ class HomeFragment : Fragment() {
         })
         
         // Observe top-rated places
-        placeViewModel.topRatedPlaces.observe(viewLifecycleOwner, Observer { topRatedPlaces ->
-            Log.i("HomeFragment", "✅ TOP RATED PLACES RECEIVED: ${topRatedPlaces.size} places from API")
-            updateDestinationsUI(topRatedPlaces)
+        placeViewModel.topRatedPlaces.observe(viewLifecycleOwner, Observer { places ->
+            Log.i("HomeFragment", "✅ TOP RATED PLACES RECEIVED: ${places.size} places from API")
+            topRatedPlaces = places // Store original data for navigation
+            updateDestinationsUI(places)
         })
         
         // Observe loading state for destinations
@@ -385,6 +416,24 @@ class HomeFragment : Fragment() {
         parentFragmentManager.beginTransaction()
             .replace(R.id.fragmentContainer, fragment)
             .addToBackStack("MyTrips")
+            .commit()
+    }
+    
+    private fun navigateToDestinationDetails(destination: TopRatedPlace) {
+        Log.d("HomeFragment", "Navigating to Destination Details: ${destination.name}")
+        val fragment = DestinationDetailsFragment.newInstance(destination)
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.fragmentContainer, fragment)
+            .addToBackStack("DestinationDetails")
+            .commit()
+    }
+    
+    private fun navigateToTripDetails(route: Route) {
+        Log.d("HomeFragment", "Navigating to Trip Details: ${route.title}")
+        val fragment = TripDetailsFragment.newInstance(route)
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.fragmentContainer, fragment)
+            .addToBackStack("TripDetails")
             .commit()
     }
 
