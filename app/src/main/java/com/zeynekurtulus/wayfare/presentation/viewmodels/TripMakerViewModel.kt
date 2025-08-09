@@ -544,6 +544,29 @@ class TripMakerViewModel(
         val title = _tripData.value?.title
         return !title.isNullOrBlank() && title.trim().length >= 3
     }
+    
+    /**
+     * Check if user has unsaved changes in the trip creation flow
+     */
+    fun hasUnsavedChanges(): Boolean {
+        val currentStepValue = _currentStep.value ?: 0
+        val currentData = _tripData.value ?: TripCreationData()
+        
+        // If user is on welcome screen (step 0), no changes yet
+        if (currentStepValue == 0) return false
+        
+        // If user has completed the entire flow (at results screen), consider it saved
+        if (currentStepValue >= 11) return false // 11 is Results step
+        
+        // Check if user has started inputting data
+        return currentData.selectedCity != null || 
+               currentData.startDate != null || 
+               currentData.endDate != null ||
+               currentData.category != null ||
+               currentData.season != null ||
+               !currentData.title.isNullOrBlank() ||
+               currentData.selectedMustVisitPlaces.isNotEmpty()
+    }
 }
 
 // Result states for route creation

@@ -296,6 +296,28 @@ class SearchPlacesFragment : Fragment() {
         }
     }
     
+    fun resetSearchResults() {
+        Log.d("SearchPlacesFragment", "Resetting search results")
+        currentQuery = ""
+        currentCity = ""
+        currentCategory = null
+        
+        binding.apply {
+            // Clear search inputs
+            searchEditText.setText("")
+            cityEditText.setText("")
+            
+            // Reset category chips
+            filterChipGroup.clearCheck()
+            
+            // Show empty state
+            showEmptyState()
+        }
+        
+        // Cancel any pending search
+        searchJob?.cancel()
+    }
+    
     override fun onDestroyView() {
         super.onDestroyView()
         searchJob?.cancel()

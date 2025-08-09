@@ -88,6 +88,18 @@ class BottomNavigationHandler(
             return
         }
         
+        // Check for unsaved changes in Trip Maker before switching
+        if (currentTab == NavigationTab.TRIP_MAKER && tripMakerFragment != null) {
+            if (checkTripMakerUnsavedChanges(tab)) {
+                return // User chose to stay, don't switch tabs
+            }
+        }
+        
+        // Check for unsaved changes in feedback screens
+        if (checkFeedbackUnsavedChanges(tab)) {
+            return // User chose to stay, don't switch tabs
+        }
+        
         val fragment = when (tab) {
             NavigationTab.HOME -> {
                 if (homeFragment == null) {
@@ -215,4 +227,226 @@ class BottomNavigationHandler(
     }
     
     fun getCurrentTab(): NavigationTab = currentTab ?: NavigationTab.HOME
+    
+    /**
+     * Check for unsaved changes in Trip Maker and show warning dialog
+     * @param targetTab The tab user wants to switch to
+     * @return true if user chose to stay (cancel navigation), false if proceed with navigation
+     */
+    private fun checkTripMakerUnsavedChanges(targetTab: NavigationTab): Boolean {
+        val fragment = tripMakerFragment ?: return false
+        
+        // Check if fragment has a method to check unsaved changes
+        try {
+            val hasUnsavedChangesMethod = fragment.javaClass.getMethod("hasUnsavedChanges")
+            val hasUnsavedChanges = hasUnsavedChangesMethod.invoke(fragment) as Boolean
+            
+            if (hasUnsavedChanges) {
+                android.util.Log.d("BottomNavigationHandler", "⚠️ Unsaved changes detected in Trip Maker")
+                showUnsavedChangesDialog(targetTab)
+                return true
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("BottomNavigationHandler", "Error checking unsaved changes", e)
+        }
+        
+        return false
+    }
+    
+    /**
+     * Show warning dialog for unsaved changes
+     */
+    private fun showUnsavedChangesDialog(targetTab: NavigationTab) {
+        if (context !is androidx.appcompat.app.AppCompatActivity) return
+        
+        val activity = context as androidx.appcompat.app.AppCompatActivity
+        val builder = androidx.appcompat.app.AlertDialog.Builder(activity)
+        
+        // Create custom view for better styling
+        val dialogView = activity.layoutInflater.inflate(R.layout.dialog_unsaved_changes, null)
+        builder.setView(dialogView)
+        
+        val dialog = builder.create()
+        
+        // Find buttons in custom layout
+        val cancelButton = dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.cancelButton)
+        val continueButton = dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.continueButton)
+        
+        cancelButton.setOnClickListener {
+            android.util.Log.d("BottomNavigationHandler", "🔄 User chose to stay in Trip Maker")
+            dialog.dismiss()
+            // User chose to stay, no further action needed
+        }
+        
+        continueButton.setOnClickListener {
+            android.util.Log.d("BottomNavigationHandler", "🗑️ User chose to discard changes and switch tabs")
+            dialog.dismiss()
+            
+            // Reset trip maker and proceed with navigation
+            resetTripMaker()
+            proceedWithTabSwitch(targetTab)
+        }
+        
+        // Make dialog background white and dim the background
+        dialog.window?.setBackgroundDrawableResource(R.drawable.bg_dialog_white)
+        dialog.window?.setDimAmount(0.6f) // Dim the background
+        
+        dialog.show()
+    }
+    
+    /**
+     * Reset Trip Maker state when user confirms leaving with unsaved changes
+     */
+    private fun resetTripMaker() {
+        tripMakerFragment?.let { fragment ->
+            try {
+                val resetMethod = fragment.javaClass.getMethod("resetTripMakerFromNavigation")
+                resetMethod.invoke(fragment)
+                android.util.Log.d("BottomNavigationHandler", "✅ Trip Maker reset successfully")
+            } catch (e: Exception) {
+                android.util.Log.e("BottomNavigationHandler", "Error resetting Trip Maker", e)
+            }
+        }
+    }
+    
+    /**
+     * Proceed with tab switch after handling unsaved changes
+     */
+    private fun proceedWithTabSwitch(targetTab: NavigationTab) {
+        android.util.Log.d("BottomNavigationHandler", "🚀 Proceeding with tab switch to: $targetTab")
+        
+        val fragment = when (targetTab) {
+            NavigationTab.HOME -> {
+                if (homeFragment == null) {
+                    homeFragment = HomeFragment()
+                }
+                homeFragment!!
+            }
+            NavigationTab.CALENDAR -> {
+                if (calendarFragment == null) {
+                    calendarFragment = CalendarFragment()
+                }
+                calendarFragment!!
+            }
+            NavigationTab.SEARCH -> {
+                if (searchFragment == null) {
+                    searchFragment = SearchFragment()
+                }
+                searchFragment!!
+            }
+            NavigationTab.TRIP_MAKER -> {
+                // This shouldn't happen since we're leaving Trip Maker
+                tripMakerFragment!!
+            }
+            NavigationTab.PROFILE -> {
+                if (profileFragment == null) {
+                    profileFragment = ProfileFragment()
+                }
+                profileFragment!!
+            }
+        }
+        
+        // Switch fragment
+        val transaction = fragmentManager.beginTransaction()
+            .replace(fragmentContainerId, fragment, targetTab.name)
+        transaction.commit()
+        
+        // Update visual state
+        updateTabSelection(targetTab)
+        currentTab = targetTab
+        android.util.Log.d("BottomNavigationHandler", "✅ Tab switch completed to: $targetTab")
+    }
+    
+    /**
+     * Check for unsaved changes in feedback screens
+     * @param targetTab The tab user wants to switch to
+     * @return true if user chose to stay (cancel navigation), false if proceed with navigation
+     */
+    private fun checkFeedbackUnsavedChanges(targetTab: NavigationTab): Boolean {
+        // Check if there are any feedback fragments in the back stack
+        for (i in 0 until fragmentManager.backStackEntryCount) {
+            val entry = fragmentManager.getBackStackEntryAt(i)
+            android.util.Log.d("BottomNavigationHandler", "Back stack entry: ${entry.name}")
+            
+            // Check if we have feedback fragments
+            if (entry.name == "GiveFeedback" || entry.name == "GivePlaceFeedback") {
+                android.util.Log.d("BottomNavigationHandler", "⚠️ Found feedback fragment in back stack")
+                
+                // Try to get the current fragment and check for unsaved changes
+                val currentFragment = fragmentManager.findFragmentById(fragmentContainerId)
+                if (currentFragment != null && hasFeedbackUnsavedChanges(currentFragment)) {
+                    showFeedbackUnsavedChangesDialog(targetTab)
+                    return true
+                }
+            }
+        }
+        
+        return false
+    }
+    
+    /**
+     * Check if a feedback fragment has unsaved changes
+     */
+    private fun hasFeedbackUnsavedChanges(fragment: androidx.fragment.app.Fragment): Boolean {
+        return try {
+            when (fragment::class.java.simpleName) {
+                "GiveFeedbackFragment", "GivePlaceFeedbackFragment" -> {
+                    val hasUnsavedChangesMethod = fragment.javaClass.getMethod("hasUnsavedChanges")
+                    hasUnsavedChangesMethod.invoke(fragment) as Boolean
+                }
+                else -> false
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("BottomNavigationHandler", "Error checking feedback unsaved changes", e)
+            false
+        }
+    }
+    
+    /**
+     * Show warning dialog for feedback unsaved changes
+     */
+    private fun showFeedbackUnsavedChangesDialog(targetTab: NavigationTab) {
+        if (context !is androidx.appcompat.app.AppCompatActivity) return
+        
+        val activity = context as androidx.appcompat.app.AppCompatActivity
+        val builder = androidx.appcompat.app.AlertDialog.Builder(activity)
+        
+        // Create custom view for better styling
+        val dialogView = activity.layoutInflater.inflate(R.layout.dialog_unsaved_changes, null)
+        builder.setView(dialogView)
+        
+        val dialog = builder.create()
+        
+        // Find buttons in custom layout
+        val cancelButton = dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.cancelButton)
+        val continueButton = dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.continueButton)
+        
+        cancelButton.setOnClickListener {
+            android.util.Log.d("BottomNavigationHandler", "🔄 User chose to stay in feedback screen")
+            dialog.dismiss()
+        }
+        
+        continueButton.setOnClickListener {
+            android.util.Log.d("BottomNavigationHandler", "🗑️ User chose to discard feedback and switch tabs")
+            dialog.dismiss()
+            
+            // Pop feedback fragments from back stack and proceed
+            while (fragmentManager.backStackEntryCount > 0) {
+                val entry = fragmentManager.getBackStackEntryAt(fragmentManager.backStackEntryCount - 1)
+                if (entry.name == "GiveFeedback" || entry.name == "GivePlaceFeedback") {
+                    fragmentManager.popBackStack()
+                } else {
+                    break
+                }
+            }
+            
+            proceedWithTabSwitch(targetTab)
+        }
+        
+        // Make dialog background white and dim the background
+        dialog.window?.setBackgroundDrawableResource(R.drawable.bg_dialog_white)
+        dialog.window?.setDimAmount(0.6f) // Dim the background
+        
+        dialog.show()
+    }
 }

@@ -65,6 +65,57 @@ class GivePlaceFeedbackFragment : Fragment() {
         }
     }
     
+    override fun onPause() {
+        super.onPause()
+        
+        // Check if user has unsaved changes and show warning if needed
+        if (hasUnsavedChanges() && !isNavigatingBack) {
+            showUnsavedChangesWarning()
+        }
+    }
+    
+    private var isNavigatingBack = false
+    
+    fun hasUnsavedChanges(): Boolean {
+        // Since this is a placeholder, we can check if user started interacting with the form
+        // For now, return false as this is not fully implemented
+        return false
+    }
+    
+    private fun showUnsavedChangesWarning() {
+        if (!isAdded || activity == null) return
+        
+        val builder = androidx.appcompat.app.AlertDialog.Builder(requireContext())
+        builder.setTitle("Unsaved Changes")
+        builder.setMessage("You have unsaved feedback. If you leave now, your feedback will be lost.\n\nAre you sure you want to continue?")
+        
+        // Create custom view for better styling
+        val dialogView = layoutInflater.inflate(com.zeynekurtulus.wayfare.R.layout.dialog_unsaved_changes, null)
+        builder.setView(dialogView)
+        
+        val dialog = builder.create()
+        
+        // Find buttons in custom layout
+        val cancelButton = dialogView.findViewById<com.google.android.material.button.MaterialButton>(com.zeynekurtulus.wayfare.R.id.cancelButton)
+        val continueButton = dialogView.findViewById<com.google.android.material.button.MaterialButton>(com.zeynekurtulus.wayfare.R.id.continueButton)
+        
+        cancelButton.setOnClickListener {
+            dialog.dismiss()
+        }
+        
+        continueButton.setOnClickListener {
+            dialog.dismiss()
+            isNavigatingBack = true
+            requireActivity().supportFragmentManager.popBackStack()
+        }
+        
+        // Make dialog background white and dim the background
+        dialog.window?.setBackgroundDrawableResource(com.zeynekurtulus.wayfare.R.drawable.bg_dialog_white)
+        dialog.window?.setDimAmount(0.6f) // Dim the background
+        
+        dialog.show()
+    }
+    
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

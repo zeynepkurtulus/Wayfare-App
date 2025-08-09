@@ -345,7 +345,45 @@ class CalendarFragment : Fragment() {
         // Add trip details dynamically
         trips.forEach { trip ->
             val tripView = layoutInflater.inflate(R.layout.item_calendar_trip, binding.selectedDateTripsContainer, false)
-            // You can populate this view with trip details
+            
+            // Populate trip details
+            val tripTitleTextView = tripView.findViewById<TextView>(R.id.tripTitleTextView)
+            val tripLocationTextView = tripView.findViewById<TextView>(R.id.tripLocationTextView)
+            val tripDatesTextView = tripView.findViewById<TextView>(R.id.tripDatesTextView)
+            val tripDurationTextView = tripView.findViewById<TextView>(R.id.tripDurationTextView)
+            val tripImageView = tripView.findViewById<de.hdodenhof.circleimageview.CircleImageView>(R.id.tripImageView)
+            
+            tripTitleTextView.text = trip.title
+            tripLocationTextView.text = "${trip.city}, ${trip.country}"
+            tripDatesTextView.text = "${trip.startDate} - ${trip.endDate}"
+            
+            // Calculate duration
+            val duration = try {
+                val start = java.time.LocalDate.parse(trip.startDate)
+                val end = java.time.LocalDate.parse(trip.endDate)
+                java.time.temporal.ChronoUnit.DAYS.between(start, end) + 1
+            } catch (e: Exception) {
+                1
+            }
+            tripDurationTextView.text = "$duration days"
+            
+            // Load trip image if available (use first place image or placeholder)
+            val firstPlaceImage = trip.mustVisit.firstOrNull()?.image
+            if (!firstPlaceImage.isNullOrEmpty()) {
+                com.bumptech.glide.Glide.with(this)
+                    .load(firstPlaceImage)
+                    .placeholder(R.drawable.ic_map_placeholder)
+                    .error(R.drawable.ic_map_placeholder)
+                    .into(tripImageView)
+            } else {
+                tripImageView.setImageResource(R.drawable.ic_map_placeholder)
+            }
+            
+            // Make trip view clickable
+            tripView.setOnClickListener {
+                onTripClicked(trip)
+            }
+            
             binding.selectedDateTripsContainer.addView(tripView)
         }
         
@@ -359,8 +397,13 @@ class CalendarFragment : Fragment() {
     
     private fun onTripClicked(trip: Route) {
         android.util.Log.d("CalendarFragment", "🎯 Trip clicked: ${trip.title}")
-        showToast("Opening ${trip.title} details")
-        // TODO: Navigate to trip details
+        
+        // Navigate to trip details fragment
+        val fragment = TripDetailsFragment.newInstance(trip)
+        requireActivity().supportFragmentManager.beginTransaction()
+            .replace(R.id.fragmentContainer, fragment)
+            .addToBackStack("TripDetails")
+            .commit()
     }
     
     private fun navigateToTripMaker() {

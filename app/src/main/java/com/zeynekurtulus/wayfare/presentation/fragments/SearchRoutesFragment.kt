@@ -259,6 +259,27 @@ class SearchRoutesFragment : Fragment() {
         }
     }
     
+    fun resetSearchResults() {
+        Log.d("SearchRoutesFragment", "Resetting search results")
+        currentQuery = ""
+        currentBudget = null
+        currentCategory = null
+        
+        binding.apply {
+            // Clear search input
+            searchEditText.setText("")
+            
+            // Reset all filter chips
+            filterChipGroup.clearCheck()
+            
+            // Show empty state
+            showEmptyState()
+        }
+        
+        // Cancel any pending search
+        searchJob?.cancel()
+    }
+    
     override fun onDestroyView() {
         super.onDestroyView()
         searchJob?.cancel()

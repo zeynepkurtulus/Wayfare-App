@@ -232,6 +232,70 @@ class GiveFeedbackFragment : Fragment() {
         }
     }
     
+    override fun onPause() {
+        super.onPause()
+        
+        // Check if user has unsaved changes and show warning if needed
+        if (hasUnsavedChanges() && !isNavigatingBack) {
+            showUnsavedChangesWarning()
+        }
+    }
+    
+    private var isNavigatingBack = false
+    
+    fun hasUnsavedChanges(): Boolean {
+        val comment = binding.commentEditText.text?.toString()?.trim() ?: ""
+        return selectedRating > 0 || comment.isNotEmpty() || selectedDate.isNotEmpty()
+    }
+    
+    private fun showUnsavedChangesWarning() {
+        if (!isAdded || activity == null) return
+        
+        val builder = androidx.appcompat.app.AlertDialog.Builder(requireContext())
+        builder.setTitle("Unsaved Changes")
+        builder.setMessage("You have unsaved feedback. If you leave now, your feedback will be lost.\n\nAre you sure you want to continue?")
+        
+        // Create custom view for better styling
+        val dialogView = layoutInflater.inflate(R.layout.dialog_unsaved_changes, null)
+        builder.setView(dialogView)
+        
+        val dialog = builder.create()
+        
+        // Find buttons in custom layout
+        val cancelButton = dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.cancelButton)
+        val continueButton = dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.continueButton)
+        
+        cancelButton.setOnClickListener {
+            Log.d("GiveFeedbackFragment", "User chose to stay and continue editing feedback")
+            dialog.dismiss()
+            // User chose to stay, no further action needed
+        }
+        
+        continueButton.setOnClickListener {
+            Log.d("GiveFeedbackFragment", "User chose to discard feedback and leave")
+            dialog.dismiss()
+            isNavigatingBack = true
+            // Reset feedback form
+            resetFeedbackForm()
+            // Navigate back
+            requireActivity().supportFragmentManager.popBackStack()
+        }
+        
+        // Make dialog background white and dim the background
+        dialog.window?.setBackgroundDrawableResource(R.drawable.bg_dialog_white)
+        dialog.window?.setDimAmount(0.6f) // Dim the background
+        
+        dialog.show()
+    }
+    
+    private fun resetFeedbackForm() {
+        selectedRating = 0
+        selectedDate = ""
+        binding.commentEditText.setText("")
+        binding.visitDateEditText.setText("")
+        updateSubmitButton()
+    }
+    
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

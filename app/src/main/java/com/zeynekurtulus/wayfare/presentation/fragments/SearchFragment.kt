@@ -52,9 +52,26 @@ class SearchFragment : Fragment() {
         }.attach()
     }
     
+    override fun onPause() {
+        super.onPause()
+        // Reset search results when user navigates away from search screen
+        resetSearchResults()
+    }
+    
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+    
+    private fun resetSearchResults() {
+        // Find and reset both search fragments
+        val adapter = binding.viewPager.adapter as? SearchPagerAdapter
+        childFragmentManager.fragments.forEach { fragment ->
+            when (fragment) {
+                is SearchRoutesFragment -> fragment.resetSearchResults()
+                is SearchPlacesFragment -> fragment.resetSearchResults()
+            }
+        }
     }
     
     /**

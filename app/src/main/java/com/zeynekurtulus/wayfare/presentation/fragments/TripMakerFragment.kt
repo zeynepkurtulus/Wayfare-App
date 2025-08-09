@@ -99,7 +99,7 @@ class TripMakerFragment : Fragment() {
     
     override fun onResume() {
         super.onResume()
-        Log.d("TripMakerFragment", "🔄 onResume: Trip maker fragment resumed")
+        Log.d("TripMakerFragment", "onResume: Trip maker fragment resumed")
         
         // Check if user is returning from another screen and reset if needed
         handleNavigationReturn()
@@ -107,17 +107,63 @@ class TripMakerFragment : Fragment() {
     
     override fun onPause() {
         super.onPause()
-        Log.d("TripMakerFragment", "⏸️ onPause: Trip maker fragment paused")
+        Log.d("TripMakerFragment", "onPause: Trip maker fragment paused")
         
-        // Mark that user navigated away (for potential reset on return)
-        markNavigatedAway()
+        // Check if user has unsaved changes and show warning if needed
+        if (viewModel.hasUnsavedChanges() && !isNavigatingBack) {
+            showUnsavedChangesWarning()
+        } else {
+            // Mark that user navigated away (for potential reset on return)
+            markNavigatedAway()
+        }
+    }
+    
+    private var isNavigatingBack = false
+    
+    private fun showUnsavedChangesWarning() {
+        if (!isAdded || activity == null) return
+        
+        val builder = androidx.appcompat.app.AlertDialog.Builder(requireContext())
+        builder.setTitle("Unsaved Changes")
+        builder.setMessage("You have unsaved changes in your trip creation. If you leave now, your progress will be lost.\n\nAre you sure you want to continue?")
+        
+        // Create custom view for better styling
+        val dialogView = layoutInflater.inflate(R.layout.dialog_unsaved_changes, null)
+        builder.setView(dialogView)
+        
+        val dialog = builder.create()
+        
+        // Find buttons in custom layout
+        val cancelButton = dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.cancelButton)
+        val continueButton = dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.continueButton)
+        
+        cancelButton.setOnClickListener {
+            Log.d("TripMakerFragment", "User chose to stay and continue editing")
+            dialog.dismiss()
+            // User chose to stay, no further action needed
+        }
+        
+        continueButton.setOnClickListener {
+            Log.d("TripMakerFragment", "User chose to discard changes and leave")
+            dialog.dismiss()
+            isNavigatingBack = true
+            markNavigatedAway()
+            // Reset the trip maker since user confirmed leaving
+            viewModel.resetFlow()
+        }
+        
+        // Make dialog background white and dim the background
+        dialog.window?.setBackgroundDrawableResource(R.drawable.bg_dialog_white)
+        dialog.window?.setDimAmount(0.6f) // Dim the background
+        
+        dialog.show()
     }
     
     private fun handleNavigationReturn() {
         // Reset trip maker to welcome screen when user returns
         // This provides a clean slate for new trip creation
         if (shouldResetOnReturn()) {
-            Log.d("TripMakerFragment", "🔄 Resetting trip maker to welcome screen")
+            Log.d("TripMakerFragment", "Resetting trip maker to welcome screen")
             resetTripMakerState()
         }
     }
@@ -159,7 +205,7 @@ class TripMakerFragment : Fragment() {
         // Clear any other persistent UI state
         clearPrivacyReferences()
         
-        Log.d("TripMakerFragment", "✅ UI state cleared")
+        Log.d("TripMakerFragment", "UI state cleared")
     }
     
     private fun clearPrivacyReferences() {
@@ -231,13 +277,13 @@ class TripMakerFragment : Fragment() {
             is PrivacyToggleState.Loading -> {
                 // Disable privacy switch during loading
                 currentPrivacySwitch?.isEnabled = false
-                Log.d("TripMakerFragment", "🔄 Privacy toggle in progress...")
+                Log.d("TripMakerFragment", "Privacy toggle in progress...")
             }
             is PrivacyToggleState.Success -> {
                 // Re-enable switch and update UI
                 currentPrivacySwitch?.isEnabled = true
                 updateCurrentPrivacyUI(state.isPublic)
-                Log.d("TripMakerFragment", "✅ Privacy toggle successful: ${state.isPublic}")
+                Log.d("TripMakerFragment", "Privacy toggle successful: ${state.isPublic}")
                 
                 // Clear the state to avoid re-processing
                 routeListViewModel.clearPrivacyToggleState()
@@ -246,7 +292,7 @@ class TripMakerFragment : Fragment() {
                 // Re-enable switch and revert state
                 currentPrivacySwitch?.isEnabled = true
                 revertPrivacySwitch()
-                Log.e("TripMakerFragment", "❌ Privacy toggle failed: ${state.message}")
+                Log.e("TripMakerFragment", "Privacy toggle failed: ${state.message}")
                 
                 // Show error message to user
                 android.widget.Toast.makeText(
@@ -288,7 +334,7 @@ class TripMakerFragment : Fragment() {
     private fun setupPrivacySwitchListener() {
         currentPrivacySwitch?.setOnCheckedChangeListener { _, isChecked ->
             currentRouteId?.let { routeId ->
-                Log.d("TripMakerFragment", "🔒 Privacy toggle changed to: $isChecked for route: $routeId")
+                Log.d("TripMakerFragment", "Privacy toggle changed to: $isChecked for route: $routeId")
                 routeListViewModel.toggleRoutePrivacy(routeId, isChecked)
             }
         }
@@ -2152,6 +2198,23 @@ class TripMakerFragment : Fragment() {
         }
     }
 
+    /**
+     * Public method for navigation handler to check unsaved changes
+     */
+    fun hasUnsavedChanges(): Boolean {
+        return viewModel.hasUnsavedChanges()
+    }
+    
+    /**
+     * Public method for navigation handler to reset Trip Maker when user confirms leaving
+     */
+    fun resetTripMakerFromNavigation() {
+        android.util.Log.d("TripMakerFragment", "🔄 Resetting Trip Maker from navigation")
+        viewModel.resetFlow()
+        clearUIState()
+        updateStepDisplay(0) // Reset to welcome screen
+    }
+    
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

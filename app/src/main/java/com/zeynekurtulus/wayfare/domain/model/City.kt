@@ -32,7 +32,10 @@ data class TripCreationData(
     var travelStyle: String? = null,
     var title: String? = null,
     var isPublic: Boolean = false  // ⭐ NEW: Privacy setting for trip creation
-) : Parcelable
+) : Parcelable {
+    // Non-parcelable field for must-visit places (managed separately)
+    var selectedMustVisitPlaces: List<MustVisitPlaceSearch> = emptyList()
+}
 
 // Category and Season Options
 data class CategoryOption(

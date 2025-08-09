@@ -526,14 +526,36 @@ class TripDetailsFragment : Fragment() {
     
     private fun showDeleteConfirmationDialog() {
         route?.let { currentRoute ->
-            androidx.appcompat.app.AlertDialog.Builder(requireContext())
-                .setTitle("Delete Trip")
-                .setMessage("Are you sure you want to delete \"${currentRoute.title}\"? This action cannot be undone.")
-                .setPositiveButton("Delete") { _, _ ->
-                    deleteTrip()
-                }
-                .setNegativeButton("Cancel", null)
-                .show()
+            val builder = androidx.appcompat.app.AlertDialog.Builder(requireContext())
+            
+            // Create custom view for better styling
+            val dialogView = layoutInflater.inflate(R.layout.dialog_delete_route, null)
+            builder.setView(dialogView)
+            
+            val dialog = builder.create()
+            
+            // Set trip title in the dialog
+            val tripTitleTextView = dialogView.findViewById<TextView>(R.id.tripTitleTextView)
+            tripTitleTextView.text = currentRoute.title
+            
+            // Find buttons in custom layout
+            val cancelButton = dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.cancelButton)
+            val deleteButton = dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.deleteButton)
+            
+            cancelButton.setOnClickListener {
+                dialog.dismiss()
+            }
+            
+            deleteButton.setOnClickListener {
+                dialog.dismiss()
+                deleteTrip()
+            }
+            
+            // Make dialog background white and dim the background
+            dialog.window?.setBackgroundDrawableResource(R.drawable.bg_dialog_white)
+            dialog.window?.setDimAmount(0.6f) // Dim the background
+            
+            dialog.show()
         }
     }
     
