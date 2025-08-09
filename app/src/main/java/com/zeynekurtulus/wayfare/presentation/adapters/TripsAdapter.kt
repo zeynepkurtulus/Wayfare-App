@@ -55,6 +55,15 @@ class TripsAdapter(
         fun bind(trip: Trip) {
             binding.tripNameTextView.text = trip.name
 
+            // Set privacy indicator
+            if (trip.isPublic) {
+                binding.privacyIndicator.setImageResource(R.drawable.ic_public)
+                binding.privacyIndicator.setColorFilter(binding.root.context.getColor(R.color.success_green))
+            } else {
+                binding.privacyIndicator.setImageResource(R.drawable.ic_lock_private)
+                binding.privacyIndicator.setColorFilter(binding.root.context.getColor(R.color.text_secondary))
+            }
+
             if (trip.imageUrl.isNotEmpty()) {
                 Log.d("TripsAdapter", "Görsel yükleniyor: ${trip.imageUrl}")
                 Glide.with(binding.root.context)

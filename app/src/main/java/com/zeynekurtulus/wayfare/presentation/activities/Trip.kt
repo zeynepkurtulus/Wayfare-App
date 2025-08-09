@@ -8,5 +8,6 @@ package com.zeynekurtulus.wayfare.presentation.activities
  */
 data class Trip(
     val name: String,
-    val imageUrl: String
+    val imageUrl: String,
+    val isPublic: Boolean = false  // Privacy indicator for UI
 )

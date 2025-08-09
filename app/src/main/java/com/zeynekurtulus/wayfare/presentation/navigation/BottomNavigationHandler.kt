@@ -167,6 +167,13 @@ class BottomNavigationHandler(
      * @return true if handled, false if should exit app
      */
     fun handleBackPress(): Boolean {
+        // Check if there are fragments in the back stack first
+        if (fragmentManager.backStackEntryCount > 0) {
+            fragmentManager.popBackStack()
+            return true
+        }
+        
+        // If no back stack, handle tab navigation
         return if (currentTab != NavigationTab.HOME) {
             // Navigate back to home
             switchToTab(NavigationTab.HOME)

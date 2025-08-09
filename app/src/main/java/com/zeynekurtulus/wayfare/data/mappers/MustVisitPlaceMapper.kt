@@ -51,7 +51,8 @@ object MustVisitPlaceMapper {
             ),
             notes = notes,
             source = "database",
-            openingHours = null
+            openingHours = null,
+            image = null
         )
     }
 }

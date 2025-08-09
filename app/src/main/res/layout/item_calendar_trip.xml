@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center_vertical">
+
+        <!-- Trip Image -->
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/tripImageView"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginEnd="16dp"
+            android:src="@drawable/ic_map_placeholder"
+            app:civ_border_width="2dp"
+            app:civ_border_color="@color/grey_200" />
+
+        <!-- Trip Details -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tripTitleTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Istanbul Adventure"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+            <TextView
+                android:id="@+id/tripLocationTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Istanbul, Turkey"
+                android:textSize="14sp"
+                android:textColor="@color/text_secondary"
+                android:layout_marginTop="2dp"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="8dp">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_calendar"
+                    app:tint="@color/primary"
+                    android:layout_marginEnd="6dp" />
+
+                <TextView
+                    android:id="@+id/tripDatesTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Dec 15 - Dec 20"
+                    android:textSize="12sp"
+                    android:textColor="@color/primary"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Trip Status Indicator -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <!-- Status Badge -->
+            <TextView
+                android:id="@+id/tripStatusTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Upcoming"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:background="@drawable/rounded_corners_8dp"
+                android:backgroundTint="@color/success_green"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Days Count -->
+            <TextView
+                android:id="@+id/tripDurationTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="6 days"
+                android:textSize="12sp"
+                android:textColor="@color/text_hint"
+                android:gravity="center" />
+
+            <!-- Privacy Indicator -->
+            <ImageView
+                android:id="@+id/privacyIndicator"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_marginTop="4dp"
+                android:src="@drawable/ic_lock_private"
+                android:contentDescription="Privacy indicator"
+                app:tint="@color/text_hint"
+                android:visibility="visible" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- Trip Progress Bar (for ongoing trips) -->
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/tripProgressIndicator"
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        android:layout_gravity="bottom"
+        app:trackColor="@color/grey_200"
+        app:indicatorColor="@color/primary"
+        android:progress="30"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+</com.google.android.material.card.MaterialCardView>

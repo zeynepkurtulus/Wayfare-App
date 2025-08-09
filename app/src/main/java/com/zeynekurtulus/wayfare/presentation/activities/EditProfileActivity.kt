@@ -126,21 +126,26 @@ class EditProfileActivity : AppCompatActivity() {
             }
             
             // Set interests
-            val interestCheckboxes = mapOf(
-                "culture" to interestCultureCheckbox,
-                "history" to interestHistoryCheckbox,
-                "food" to interestFoodCheckbox,
-                "adventure" to interestAdventureCheckbox,
-                "nature" to interestNatureCheckbox,
-                "nightlife" to interestNightlifeCheckbox,
-                "shopping" to interestShoppingCheckbox,
-                "art" to interestArtCheckbox,
-                "architecture" to interestArchitectureCheckbox,
-                "photography" to interestPhotographyCheckbox
-            )
+                    val interestCheckboxes = mapOf(
+            "Museums" to interestMuseumsCheckbox,
+            "Major Museums" to interestMajorMuseumsCheckbox,
+            "Theme Parks" to interestThemeParksCheckbox,
+            "Parks & Nature" to interestParksNatureCheckbox,
+            "Zoos & Aquariums" to interestZoosAquariumsCheckbox,
+            "Sports & Recreation" to interestSportsRecreationCheckbox,
+            "Entertainment" to interestEntertainmentCheckbox,
+            "Wellness & Relaxation" to interestWellnessRelaxationCheckbox,
+            "Cultural Sites" to interestCulturalSitesCheckbox,
+            "Religious Sites" to interestReligiousSitesCheckbox,
+            "Shopping & Markets" to interestShoppingMarketsCheckbox,
+            "Tours & Activities" to interestToursActivitiesCheckbox,
+            "Landmarks & Monuments" to interestLandmarksMonumentsCheckbox,
+            "Transportation" to interestTransportationCheckbox,
+            "Other" to interestOtherCheckbox
+        )
             
             preferences.interests.forEach { interest ->
-                interestCheckboxes[interest.lowercase()]?.isChecked = true
+                interestCheckboxes[interest]?.isChecked = true
             }
         }
     }
@@ -167,11 +172,13 @@ class EditProfileActivity : AppCompatActivity() {
         }
         
         // Get selected budget
+        Log.d("EditProfileActivity", "Budget radio states - Low: ${binding.budgetLowRadio.isChecked}, Medium: ${binding.budgetMediumRadio.isChecked}, High: ${binding.budgetHighRadio.isChecked}")
         val budget = when {
             binding.budgetLowRadio.isChecked -> "low"
             binding.budgetMediumRadio.isChecked -> "medium"
             binding.budgetHighRadio.isChecked -> "high"
             else -> {
+                Log.e("EditProfileActivity", "No budget selected!")
                 DialogUtils.showErrorDialog(
                     this,
                     "Validation Error",
@@ -199,16 +206,21 @@ class EditProfileActivity : AppCompatActivity() {
         // Get selected interests
         val interests = mutableListOf<String>()
         val interestCheckboxes = mapOf(
-            "culture" to binding.interestCultureCheckbox,
-            "history" to binding.interestHistoryCheckbox,
-            "food" to binding.interestFoodCheckbox,
-            "adventure" to binding.interestAdventureCheckbox,
-            "nature" to binding.interestNatureCheckbox,
-            "nightlife" to binding.interestNightlifeCheckbox,
-            "shopping" to binding.interestShoppingCheckbox,
-            "art" to binding.interestArtCheckbox,
-            "architecture" to binding.interestArchitectureCheckbox,
-            "photography" to binding.interestPhotographyCheckbox
+            "Museums" to binding.interestMuseumsCheckbox,
+            "Major Museums" to binding.interestMajorMuseumsCheckbox,
+            "Theme Parks" to binding.interestThemeParksCheckbox,
+            "Parks & Nature" to binding.interestParksNatureCheckbox,
+            "Zoos & Aquariums" to binding.interestZoosAquariumsCheckbox,
+            "Sports & Recreation" to binding.interestSportsRecreationCheckbox,
+            "Entertainment" to binding.interestEntertainmentCheckbox,
+            "Wellness & Relaxation" to binding.interestWellnessRelaxationCheckbox,
+            "Cultural Sites" to binding.interestCulturalSitesCheckbox,
+            "Religious Sites" to binding.interestReligiousSitesCheckbox,
+            "Shopping & Markets" to binding.interestShoppingMarketsCheckbox,
+            "Tours & Activities" to binding.interestToursActivitiesCheckbox,
+            "Landmarks & Monuments" to binding.interestLandmarksMonumentsCheckbox,
+            "Transportation" to binding.interestTransportationCheckbox,
+            "Other" to binding.interestOtherCheckbox
         )
         
         interestCheckboxes.forEach { (interest, checkbox) ->

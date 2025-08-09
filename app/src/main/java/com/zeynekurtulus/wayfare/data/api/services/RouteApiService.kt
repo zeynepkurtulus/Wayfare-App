@@ -45,4 +45,27 @@ interface RouteApiService {
         @Query("budget") budget: String? = null,
         @Query("limit") limit: Int = 10
     ): Response<PublicRoutesResponse>
+    
+ 
+    @PATCH("routes/{route_id}/privacy")
+    suspend fun toggleRoutePrivacy(
+        @Header("Authorization") authorization: String,
+        @Path("route_id") routeId: String,
+        @Query("is_public") isPublic: Boolean
+    ): Response<ApiSuccessResponse>
+    
+
+    @GET("routes/search")
+    suspend fun searchPublicRoutes(
+        @Header("Authorization") authorization: String,
+        @Query("q") searchQuery: String? = null,
+        @Query("city") city: String? = null,
+        @Query("country") country: String? = null,
+        @Query("category") category: String? = null,
+        @Query("season") season: String? = null,
+        @Query("budget") budget: String? = null,
+        @Query("travel_style") travelStyle: String? = null,
+        @Query("limit") limit: Int = 20,
+        @Query("sort_by") sortBy: String = "popularity"
+    ): Response<PublicRoutesResponse>
 }

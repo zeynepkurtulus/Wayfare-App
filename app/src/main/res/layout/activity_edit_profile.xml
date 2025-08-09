@@ -83,20 +83,24 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
                         android:hint="@string/first_name"
-                        app:boxBackgroundMode="filled"
-                        app:boxBackgroundColor="@color/input_background"
-                        app:boxStrokeColor="@color/primary"
-                        app:boxStrokeWidthFocused="2dp"
+                        app:boxBackgroundColor="@color/input_fields_filling"
+                        app:boxCornerRadiusBottomEnd="12dp"
+                        app:boxCornerRadiusBottomStart="12dp"
+                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusTopStart="12dp"
+                        app:boxStrokeWidth="0dp"
+                        app:boxStrokeWidthFocused="0dp"
                         app:hintTextColor="@color/text_hint">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/firstNameEditText"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:inputType="textPersonName"
                             android:textColor="@color/text_primary"
+                            android:textColorHint="@color/text_hint"
                             android:textSize="16sp"
-                            android:paddingVertical="14dp" />
+                            android:inputType="textPersonName"
+                             />
 
                     </com.google.android.material.textfield.TextInputLayout>
 
@@ -106,20 +110,23 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
                         android:hint="@string/last_name"
-                        app:boxBackgroundMode="filled"
-                        app:boxBackgroundColor="@color/input_background"
-                        app:boxStrokeColor="@color/primary"
-                        app:boxStrokeWidthFocused="2dp"
+                        app:boxBackgroundColor="@color/input_fields_filling"
+                        app:boxCornerRadiusBottomEnd="12dp"
+                        app:boxCornerRadiusBottomStart="12dp"
+                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusTopStart="12dp"
+                        app:boxStrokeWidth="0dp"
+                        app:boxStrokeWidthFocused="0dp"
                         app:hintTextColor="@color/text_hint">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/lastNameEditText"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:inputType="textPersonName"
                             android:textColor="@color/text_primary"
+                            android:textColorHint="@color/text_hint"
                             android:textSize="16sp"
-                            android:paddingVertical="14dp" />
+                            android:inputType="textPersonName" />
 
                     </com.google.android.material.textfield.TextInputLayout>
 
@@ -128,10 +135,13 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/home_city"
-                        app:boxBackgroundMode="filled"
-                        app:boxBackgroundColor="@color/input_background"
-                        app:boxStrokeColor="@color/primary"
-                        app:boxStrokeWidthFocused="2dp"
+                        app:boxBackgroundColor="@color/input_fields_filling"
+                        app:boxCornerRadiusBottomEnd="12dp"
+                        app:boxCornerRadiusBottomStart="12dp"
+                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusTopStart="12dp"
+                        app:boxStrokeWidth="0dp"
+                        app:boxStrokeWidthFocused="0dp"
                         app:hintTextColor="@color/text_hint">
 
                         <com.google.android.material.textfield.TextInputEditText
@@ -140,9 +150,8 @@
                             android:layout_height="wrap_content"
                             android:inputType="text"
                             android:textColor="@color/text_primary"
-                            android:textSize="16sp"
-
-                            android:paddingVertical="14dp" />
+                            android:textColorHint="@color/text_hint"
+                            android:textSize="16sp" />
 
                     </com.google.android.material.textfield.TextInputLayout>
 
@@ -281,138 +290,216 @@
                         android:textSize="14sp"
                         android:layout_marginBottom="12dp" />
 
-                    <!-- Interests Checkboxes in a Grid -->
-                    <LinearLayout
+                    <!-- Interests Checkboxes - Updated to match step_interests -->
+                    <androidx.core.widget.NestedScrollView
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical">
+                        android:layout_height="200dp"
+                        android:fillViewport="false">
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal">
+                            android:orientation="vertical">
 
-                            <CheckBox
-                                android:id="@+id/interestCultureCheckbox"
-                                android:layout_width="0dp"
+                            <LinearLayout
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="@string/interest_culture"
-                                android:textColor="@color/text_primary"
-                                android:buttonTint="@color/primary" />
+                                android:orientation="horizontal">
 
-                            <CheckBox
-                                android:id="@+id/interestHistoryCheckbox"
-                                android:layout_width="0dp"
+                                <CheckBox
+                                    android:id="@+id/interestMuseumsCheckbox"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="Museums"
+                                    android:textColor="@color/text_primary"
+                                    android:buttonTint="@color/primary" />
+
+                                <CheckBox
+                                    android:id="@+id/interestMajorMuseumsCheckbox"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="Major Museums"
+                                    android:textColor="@color/text_primary"
+                                    android:buttonTint="@color/primary" />
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="@string/interest_history"
-                                android:textColor="@color/text_primary"
-                                android:buttonTint="@color/primary" />
+                                android:orientation="horizontal">
+
+                                <CheckBox
+                                    android:id="@+id/interestThemeParksCheckbox"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="Theme Parks"
+                                    android:textColor="@color/text_primary"
+                                    android:buttonTint="@color/primary" />
+
+                                <CheckBox
+                                    android:id="@+id/interestParksNatureCheckbox"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="Parks &amp; Nature"
+                                    android:textColor="@color/text_primary"
+                                    android:buttonTint="@color/primary" />
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <CheckBox
+                                    android:id="@+id/interestZoosAquariumsCheckbox"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="Zoos &amp; Aquariums"
+                                    android:textColor="@color/text_primary"
+                                    android:buttonTint="@color/primary" />
+
+                                <CheckBox
+                                    android:id="@+id/interestSportsRecreationCheckbox"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="Sports &amp; Recreation"
+                                    android:textColor="@color/text_primary"
+                                    android:buttonTint="@color/primary" />
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <CheckBox
+                                    android:id="@+id/interestEntertainmentCheckbox"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="Entertainment"
+                                    android:textColor="@color/text_primary"
+                                    android:buttonTint="@color/primary" />
+
+                                <CheckBox
+                                    android:id="@+id/interestWellnessRelaxationCheckbox"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="Wellness &amp; Relaxation"
+                                    android:textColor="@color/text_primary"
+                                    android:buttonTint="@color/primary" />
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <CheckBox
+                                    android:id="@+id/interestCulturalSitesCheckbox"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="Cultural Sites"
+                                    android:textColor="@color/text_primary"
+                                    android:buttonTint="@color/primary" />
+
+                                <CheckBox
+                                    android:id="@+id/interestReligiousSitesCheckbox"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="Religious Sites"
+                                    android:textColor="@color/text_primary"
+                                    android:buttonTint="@color/primary" />
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <CheckBox
+                                    android:id="@+id/interestShoppingMarketsCheckbox"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="Shopping &amp; Markets"
+                                    android:textColor="@color/text_primary"
+                                    android:buttonTint="@color/primary" />
+
+                                <CheckBox
+                                    android:id="@+id/interestToursActivitiesCheckbox"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="Tours &amp; Activities"
+                                    android:textColor="@color/text_primary"
+                                    android:buttonTint="@color/primary" />
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <CheckBox
+                                    android:id="@+id/interestLandmarksMonumentsCheckbox"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="Landmarks &amp; Monuments"
+                                    android:textColor="@color/text_primary"
+                                    android:buttonTint="@color/primary" />
+
+                                <CheckBox
+                                    android:id="@+id/interestTransportationCheckbox"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="Transportation"
+                                    android:textColor="@color/text_primary"
+                                    android:buttonTint="@color/primary" />
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <CheckBox
+                                    android:id="@+id/interestOtherCheckbox"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="Other"
+                                    android:textColor="@color/text_primary"
+                                    android:buttonTint="@color/primary" />
+
+                                <View
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1" />
+
+                            </LinearLayout>
 
                         </LinearLayout>
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal">
-
-                            <CheckBox
-                                android:id="@+id/interestFoodCheckbox"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="@string/interest_food"
-                                android:textColor="@color/text_primary"
-                                android:buttonTint="@color/primary" />
-
-                            <CheckBox
-                                android:id="@+id/interestAdventureCheckbox"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="@string/interest_adventure"
-                                android:textColor="@color/text_primary"
-                                android:buttonTint="@color/primary" />
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal">
-
-                            <CheckBox
-                                android:id="@+id/interestNatureCheckbox"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="@string/interest_nature"
-                                android:textColor="@color/text_primary"
-                                android:buttonTint="@color/primary" />
-
-                            <CheckBox
-                                android:id="@+id/interestNightlifeCheckbox"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="@string/interest_nightlife"
-                                android:textColor="@color/text_primary"
-                                android:buttonTint="@color/primary" />
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal">
-
-                            <CheckBox
-                                android:id="@+id/interestShoppingCheckbox"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="@string/interest_shopping"
-                                android:textColor="@color/text_primary"
-                                android:buttonTint="@color/primary" />
-
-                            <CheckBox
-                                android:id="@+id/interestArtCheckbox"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="@string/interest_art"
-                                android:textColor="@color/text_primary"
-                                android:buttonTint="@color/primary" />
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal">
-
-                            <CheckBox
-                                android:id="@+id/interestArchitectureCheckbox"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="@string/interest_architecture"
-                                android:textColor="@color/text_primary"
-                                android:buttonTint="@color/primary" />
-
-                            <CheckBox
-                                android:id="@+id/interestPhotographyCheckbox"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="@string/interest_photography"
-                                android:textColor="@color/text_primary"
-                                android:buttonTint="@color/primary" />
-
-                        </LinearLayout>
-
-                    </LinearLayout>
+                    </androidx.core.widget.NestedScrollView>
 
                 </LinearLayout>
 

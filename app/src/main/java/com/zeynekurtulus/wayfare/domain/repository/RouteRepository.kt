@@ -21,4 +21,10 @@ interface RouteRepository {
         budget: String? = null,
         limit: Int = 10
     ): ApiResult<List<Route>>
+    
+    // ⭐ NEW: Privacy toggle for routes
+    suspend fun toggleRoutePrivacy(routeId: String, isPublic: Boolean): ApiResult<Unit>
+    
+    // ⭐ NEW: Advanced public route search
+    suspend fun searchPublicRoutes(searchParams: RouteSearchParams): ApiResult<List<Route>>
 }

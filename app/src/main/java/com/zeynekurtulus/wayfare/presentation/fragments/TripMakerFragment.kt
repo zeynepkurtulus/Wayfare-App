@@ -38,6 +38,8 @@ import com.zeynekurtulus.wayfare.presentation.adapters.MustVisitPlacesAdapter
 import com.zeynekurtulus.wayfare.presentation.adapters.SelectedPlacesAdapter
 import com.zeynekurtulus.wayfare.presentation.viewmodels.TripMakerViewModel
 import com.zeynekurtulus.wayfare.presentation.viewmodels.RouteCreationResult
+import com.zeynekurtulus.wayfare.presentation.viewmodels.RouteListViewModel
+import com.zeynekurtulus.wayfare.presentation.viewmodels.PrivacyToggleState
 import com.zeynekurtulus.wayfare.utils.getAppContainer
 import com.bumptech.glide.Glide
 
@@ -61,10 +63,21 @@ class TripMakerFragment : Fragment() {
     private val viewModel: TripMakerViewModel by viewModels {
         getAppContainer().viewModelFactory
     }
+    
+    // ⭐ NEW: RouteListViewModel for privacy functionality
+    private val routeListViewModel: RouteListViewModel by viewModels {
+        getAppContainer().viewModelFactory
+    }
 
     private lateinit var citySuggestionsAdapter: CitySuggestionsAdapter
     private lateinit var mustVisitPlacesAdapter: MustVisitPlacesAdapter
     private lateinit var selectedPlacesAdapter: SelectedPlacesAdapter
+    
+
+    private var currentPrivacySwitch: com.google.android.material.materialswitch.MaterialSwitch? = null
+    private var currentPrivacyIcon: ImageView? = null
+    private var currentPrivacyDescription: TextView? = null
+    private var currentRouteId: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -82,6 +95,79 @@ class TripMakerFragment : Fragment() {
         initializeCitySuggestionsAdapter()
         setupObservers()
         setupStepFlow()
+    }
+    
+    override fun onResume() {
+        super.onResume()
+        Log.d("TripMakerFragment", "🔄 onResume: Trip maker fragment resumed")
+        
+        // Check if user is returning from another screen and reset if needed
+        handleNavigationReturn()
+    }
+    
+    override fun onPause() {
+        super.onPause()
+        Log.d("TripMakerFragment", "⏸️ onPause: Trip maker fragment paused")
+        
+        // Mark that user navigated away (for potential reset on return)
+        markNavigatedAway()
+    }
+    
+    private fun handleNavigationReturn() {
+        // Reset trip maker to welcome screen when user returns
+        // This provides a clean slate for new trip creation
+        if (shouldResetOnReturn()) {
+            Log.d("TripMakerFragment", "🔄 Resetting trip maker to welcome screen")
+            resetTripMakerState()
+        }
+    }
+    
+    private fun shouldResetOnReturn(): Boolean {
+        // Always reset for clean UX - users expect fresh start when returning to trip maker
+        return true
+    }
+    
+    private fun markNavigatedAway() {
+        // We could store this in SharedPreferences or ViewModel if needed
+        // For now, we'll use the simple approach of always resetting on return
+    }
+    
+    private fun resetTripMakerState() {
+        // Reset ViewModel state
+        viewModel.resetFlow()
+        
+        // Clear any UI state that might persist
+        clearUIState()
+        
+        // Ensure we start from the welcome screen
+        updateStepDisplay(0)
+    }
+    
+    private fun clearUIState() {
+        // Clear city search field
+        val searchEditText = binding.destinationStep.root.findViewById<TextInputEditText>(R.id.destinationSearchEditText)
+        searchEditText?.setText("")
+        
+        // Hide city suggestions
+        val suggestionsRecyclerView = binding.destinationStep.root.findViewById<RecyclerView>(R.id.citySuggestionsRecyclerView)
+        suggestionsRecyclerView?.visibility = View.GONE
+        
+        // Clear selected city card
+        val selectedCityCard = binding.destinationStep.root.findViewById<View>(R.id.selectedCityCard)
+        selectedCityCard?.visibility = View.GONE
+        
+        // Clear any other persistent UI state
+        clearPrivacyReferences()
+        
+        Log.d("TripMakerFragment", "✅ UI state cleared")
+    }
+    
+    private fun clearPrivacyReferences() {
+        // Clear privacy control references to avoid stale state
+        currentPrivacySwitch = null
+        currentPrivacyIcon = null
+        currentPrivacyDescription = null
+        currentRouteId = null
     }
 
     private fun setupObservers() {
@@ -132,6 +218,80 @@ class TripMakerFragment : Fragment() {
                 displaySelectedCity(selectedCity)
             }
         })
+        
+        // ⭐ NEW: Observe privacy toggle state
+        routeListViewModel.privacyToggleState.observe(viewLifecycleOwner, Observer { state ->
+            handlePrivacyToggleState(state)
+        })
+    }
+    
+    // ⭐ NEW: Handle privacy toggle state changes
+    private fun handlePrivacyToggleState(state: PrivacyToggleState) {
+        when (state) {
+            is PrivacyToggleState.Loading -> {
+                // Disable privacy switch during loading
+                currentPrivacySwitch?.isEnabled = false
+                Log.d("TripMakerFragment", "🔄 Privacy toggle in progress...")
+            }
+            is PrivacyToggleState.Success -> {
+                // Re-enable switch and update UI
+                currentPrivacySwitch?.isEnabled = true
+                updateCurrentPrivacyUI(state.isPublic)
+                Log.d("TripMakerFragment", "✅ Privacy toggle successful: ${state.isPublic}")
+                
+                // Clear the state to avoid re-processing
+                routeListViewModel.clearPrivacyToggleState()
+            }
+            is PrivacyToggleState.Error -> {
+                // Re-enable switch and revert state
+                currentPrivacySwitch?.isEnabled = true
+                revertPrivacySwitch()
+                Log.e("TripMakerFragment", "❌ Privacy toggle failed: ${state.message}")
+                
+                // Show error message to user
+                android.widget.Toast.makeText(
+                    requireContext(), 
+                    "Failed to update privacy setting. Please try again.", 
+                    android.widget.Toast.LENGTH_SHORT
+                ).show()
+                
+                // Clear the state to avoid re-processing
+                routeListViewModel.clearPrivacyToggleState()
+            }
+            is PrivacyToggleState.Idle -> {
+                // Do nothing
+            }
+        }
+    }
+    
+    // ⭐ NEW: Helper functions for privacy UI management
+    private fun updateCurrentPrivacyUI(isPublic: Boolean) {
+        currentPrivacyIcon?.let { icon ->
+            currentPrivacyDescription?.let { description ->
+                currentPrivacySwitch?.let { switch ->
+                    updatePrivacyUI(isPublic, icon, description, switch)
+                }
+            }
+        }
+    }
+    
+    private fun revertPrivacySwitch() {
+        currentPrivacySwitch?.let { switch ->
+            // Temporarily remove listener to avoid infinite loops
+            switch.setOnCheckedChangeListener(null)
+            switch.isChecked = !switch.isChecked
+            // Re-attach listener
+            setupPrivacySwitchListener()
+        }
+    }
+    
+    private fun setupPrivacySwitchListener() {
+        currentPrivacySwitch?.setOnCheckedChangeListener { _, isChecked ->
+            currentRouteId?.let { routeId ->
+                Log.d("TripMakerFragment", "🔒 Privacy toggle changed to: $isChecked for route: $routeId")
+                routeListViewModel.toggleRoutePrivacy(routeId, isChecked)
+            }
+        }
     }
 
     private fun setupStepFlow() {
@@ -339,9 +499,13 @@ class TripMakerFragment : Fragment() {
         val nextButton = binding.dateStep.root.findViewById<Button>(R.id.dateNextButton)
         val backButton = binding.dateStep.root.findViewById<Button>(R.id.dateBackButton)
         
-        // Date format for display
-        val displayDateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
-        val apiDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        // Date format for display (ensure UTC timezone to match MaterialDatePicker)
+        val displayDateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).apply {
+            timeZone = TimeZone.getTimeZone("UTC")
+        }
+        val apiDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).apply {
+            timeZone = TimeZone.getTimeZone("UTC")
+        }
         
         // Start date picker
         startDateButton?.setOnClickListener {
@@ -353,12 +517,15 @@ class TripMakerFragment : Fragment() {
             datePicker.show(parentFragmentManager, "START_DATE_PICKER")
             
             datePicker.addOnPositiveButtonClickListener { selection ->
-                val selectedDate = Date(selection)
-                val displayDate = displayDateFormat.format(selectedDate)
-                val apiDate = apiDateFormat.format(selectedDate)
+                // MaterialDatePicker returns UTC milliseconds, we need to handle timezone properly
+                val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+                calendar.timeInMillis = selection
+                
+                val displayDate = displayDateFormat.format(calendar.time)
+                val apiDate = apiDateFormat.format(calendar.time)
                 
                 startDateTextView?.text = displayDate
-                android.util.Log.d("TripMakerFragment", "Start date selected: $apiDate")
+                android.util.Log.d("TripMakerFragment", "Start date selected: $apiDate (UTC millis: $selection)")
                 
                 // Update ViewModel with dates if both are selected
                 updateDatesInViewModel(startDateTextView, endDateTextView, durationCard, durationTextView, apiDateFormat)
@@ -375,12 +542,15 @@ class TripMakerFragment : Fragment() {
             datePicker.show(parentFragmentManager, "END_DATE_PICKER")
             
             datePicker.addOnPositiveButtonClickListener { selection ->
-                val selectedDate = Date(selection)
-                val displayDate = displayDateFormat.format(selectedDate)
-                val apiDate = apiDateFormat.format(selectedDate)
+                // MaterialDatePicker returns UTC milliseconds, we need to handle timezone properly
+                val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+                calendar.timeInMillis = selection
+                
+                val displayDate = displayDateFormat.format(calendar.time)
+                val apiDate = apiDateFormat.format(calendar.time)
                 
                 endDateTextView?.text = displayDate
-                android.util.Log.d("TripMakerFragment", "End date selected: $apiDate")
+                android.util.Log.d("TripMakerFragment", "End date selected: $apiDate (UTC millis: $selection)")
                 
                 // Update ViewModel with dates if both are selected
                 updateDatesInViewModel(startDateTextView, endDateTextView, durationCard, durationTextView, apiDateFormat)
@@ -774,6 +944,9 @@ class TripMakerFragment : Fragment() {
         // Update summary fields
         updateTitleSummary()
         
+        // Setup privacy controls
+        setupTitlePrivacyControls()
+        
         // Generate suggestions based on trip data
         val tripData = viewModel.tripData.value
         val cityName = tripData?.selectedCity?.name ?: "Destination"
@@ -907,8 +1080,8 @@ class TripMakerFragment : Fragment() {
         
         startOverButton?.setOnClickListener {
             // Reset the trip maker and start over
-            viewModel.resetTripMaker()
-            android.util.Log.d("TripMakerFragment", "Start Over clicked")
+            android.util.Log.d("TripMakerFragment", "🔄 Start Over clicked - resetting trip maker")
+            resetTripMakerState()
         }
         
         // Populate results with actual trip data
@@ -1191,7 +1364,7 @@ class TripMakerFragment : Fragment() {
         }
         
         highBudgetCard?.setOnClickListener {
-            selectBudget(highBudgetCard, "luxury")
+            selectBudget(highBudgetCard, "high")
         }
         
         // Navigation buttons
@@ -1219,9 +1392,9 @@ class TripMakerFragment : Fragment() {
                         selectBudget(mediumBudgetCard, "mid_range")
                         Log.d("TripMakerFragment", "Pre-selected: Mid-range")
                     }
-                    "luxury" -> {
-                        selectBudget(highBudgetCard, "luxury")
-                        Log.d("TripMakerFragment", "Pre-selected: Luxury")
+                    "high" -> {
+                        selectBudget(highBudgetCard, "high")
+                        Log.d("TripMakerFragment", "Pre-selected: High")
                     }
                     else -> {
                         Log.d("TripMakerFragment", "Unknown budget preference: ${preferences.budget}")
@@ -1405,10 +1578,13 @@ class TripMakerFragment : Fragment() {
         val budgetDisplay = when (routeDetail.budget) {
             "budget" -> "Budget ($50-100/day)"
             "mid_range" -> "Mid-range ($100-200/day)"
-            "luxury" -> "Luxury ($200+/day)"
+            "high" -> "High ($200+/day)"
             else -> routeDetail.budget
         }
         tripBudgetText?.text = budgetDisplay
+        
+        // Setup privacy controls
+        setupPrivacyToggle(routeDetail)
         
         // Load the daily itinerary with actual route data
         loadDailyItinerary(routeDetail)
@@ -1868,6 +2044,112 @@ class TripMakerFragment : Fragment() {
     // Extension function to convert dp to px
     private fun Int.dpToPx(context: android.content.Context): Int {
         return (this * context.resources.displayMetrics.density).toInt()
+    }
+    
+    // ⭐ NEW: Setup privacy toggle controls
+    private fun setupPrivacyToggle(routeDetail: RouteDetail) {
+        val tripDetailsRoot = binding.tripDetailsStep.root
+        val privacyCard = tripDetailsRoot.findViewById<com.google.android.material.card.MaterialCardView>(R.id.privacyCard)
+        val privacyIcon = tripDetailsRoot.findViewById<ImageView>(R.id.privacyIcon)
+        val privacyDescriptionText = tripDetailsRoot.findViewById<TextView>(R.id.privacyDescriptionText)
+        val privacyToggleSwitch = tripDetailsRoot.findViewById<com.google.android.material.materialswitch.MaterialSwitch>(R.id.privacyToggleSwitch)
+        
+        if (privacyIcon == null || privacyDescriptionText == null || privacyToggleSwitch == null) {
+            Log.e("TripMakerFragment", "❌ Privacy controls not found in layout")
+            return
+        }
+        
+        // Store references for state management
+        currentPrivacySwitch = privacyToggleSwitch
+        currentPrivacyIcon = privacyIcon
+        currentPrivacyDescription = privacyDescriptionText
+        currentRouteId = routeDetail.routeId
+        
+        // Initialize UI based on current privacy state
+        updatePrivacyUI(routeDetail.isPublic, privacyIcon, privacyDescriptionText, privacyToggleSwitch)
+        
+        // Set up switch listener using the helper function
+        setupPrivacySwitchListener()
+        
+        // ⭐ NEW: Make entire card clickable
+        privacyCard?.setOnClickListener {
+            Log.d("TripMakerFragment", "🔒 Privacy card clicked - toggling switch")
+            privacyToggleSwitch.isChecked = !privacyToggleSwitch.isChecked
+        }
+        
+        Log.d("TripMakerFragment", "✅ Privacy toggle setup complete for route: ${routeDetail.routeId}")
+    }
+    
+    private fun updatePrivacyUI(
+        isPublic: Boolean, 
+        privacyIcon: ImageView, 
+        privacyDescriptionText: TextView, 
+        privacyToggleSwitch: com.google.android.material.materialswitch.MaterialSwitch
+    ) {
+        if (isPublic) {
+            privacyIcon.setImageResource(R.drawable.ic_public)
+            privacyIcon.setColorFilter(ContextCompat.getColor(requireContext(), R.color.success_green))
+            privacyDescriptionText.text = "This trip is public"
+            privacyToggleSwitch.isChecked = true
+        } else {
+            privacyIcon.setImageResource(R.drawable.ic_lock_private)
+            privacyIcon.setColorFilter(ContextCompat.getColor(requireContext(), R.color.text_secondary))
+            privacyDescriptionText.text = "This trip is private"
+            privacyToggleSwitch.isChecked = false
+        }
+    }
+    
+    // ⭐ NEW: Setup privacy controls in title step
+    private fun setupTitlePrivacyControls() {
+        val titleRoot = binding.titleStep.root
+        val privacyCard = titleRoot.findViewById<com.google.android.material.card.MaterialCardView>(R.id.titlePrivacyCard)
+        val privacyIcon = titleRoot.findViewById<ImageView>(R.id.titlePrivacyIcon)
+        val privacyDescription = titleRoot.findViewById<TextView>(R.id.titlePrivacyDescription)
+        val privacySwitch = titleRoot.findViewById<com.google.android.material.materialswitch.MaterialSwitch>(R.id.titlePrivacySwitch)
+        
+        if (privacyIcon == null || privacyDescription == null || privacySwitch == null) {
+            Log.e("TripMakerFragment", "❌ Title privacy controls not found in layout")
+            return
+        }
+        
+        // Get current privacy setting from ViewModel (default to private)
+        val currentTripData = viewModel.tripData.value
+        val isPublic = currentTripData?.isPublic ?: false
+        
+        // Initialize UI
+        updateTitlePrivacyUI(isPublic, privacyIcon, privacyDescription, privacySwitch)
+        
+        // Set up switch listener
+        privacySwitch.setOnCheckedChangeListener { _, isChecked ->
+            Log.d("TripMakerFragment", "🔒 Title privacy changed to: $isChecked")
+            viewModel.setTripPrivacy(isChecked)
+            updateTitlePrivacyUI(isChecked, privacyIcon, privacyDescription, privacySwitch)
+        }
+        
+       
+        privacyCard?.setOnClickListener {
+            Log.d("TripMakerFragment", "🔒 Privacy card clicked - toggling switch")
+            privacySwitch.isChecked = !privacySwitch.isChecked
+        }
+    }
+    
+    private fun updateTitlePrivacyUI(
+        isPublic: Boolean,
+        privacyIcon: ImageView,
+        privacyDescription: TextView,
+        privacySwitch: com.google.android.material.materialswitch.MaterialSwitch
+    ) {
+        if (isPublic) {
+            privacyIcon.setImageResource(R.drawable.ic_public)
+            privacyIcon.setColorFilter(ContextCompat.getColor(requireContext(), R.color.success_green))
+            privacyDescription.text = "Public - Others can discover this trip"
+            privacySwitch.isChecked = true
+        } else {
+            privacyIcon.setImageResource(R.drawable.ic_lock_private)
+            privacyIcon.setColorFilter(ContextCompat.getColor(requireContext(), R.color.text_secondary))
+            privacyDescription.text = "Private - Only you can see this trip"
+            privacySwitch.isChecked = false
+        }
     }
 
     override fun onDestroyView() {

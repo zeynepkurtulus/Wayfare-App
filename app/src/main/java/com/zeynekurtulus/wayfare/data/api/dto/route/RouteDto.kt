@@ -10,7 +10,8 @@ data class CreateRouteRequest(
     @SerializedName("end_date") val endDate: String,
     @SerializedName("category") val category: String,
     @SerializedName("season") val season: String,
-    @SerializedName("must_visit") val mustVisit: List<MustVisitPlaceDto>
+    @SerializedName("must_visit") val mustVisit: List<MustVisitPlaceDto>,
+    @SerializedName("is_public") val isPublic: Boolean = false  
 )
 
 data class UpdateRouteRequest(
@@ -29,7 +30,8 @@ data class MustVisitPlaceDto(
     @SerializedName("address") val address: String?,
     @SerializedName("notes") val notes: String?,
     @SerializedName("source") val source: String,
-    @SerializedName("coordinates") val coordinates: CoordinatesDto?
+    @SerializedName("coordinates") val coordinates: CoordinatesDto?,
+    @SerializedName("image") val image: String?
 )
 
 data class RouteDayDto(
@@ -97,7 +99,8 @@ data class RouteDto(
     @SerializedName("must_visit") val mustVisit: List<MustVisitPlaceDetailDto>,
     @SerializedName("days") val days: List<RouteDayDto>,
     @SerializedName("created_at") val createdAt: String?,
-    @SerializedName("updated_at") val updatedAt: String?
+    @SerializedName("updated_at") val updatedAt: String?,
+    @SerializedName("is_public") val isPublic: Boolean = false  // ⭐ NEW FIELD
 )
 
 data class RouteDetailDto(
@@ -119,7 +122,8 @@ data class RouteDetailDto(
     @SerializedName("must_visit") val mustVisit: List<MustVisitPlaceDetailDto>,
     @SerializedName("days") val days: List<RouteDayDto>,
     @SerializedName("created_at") val createdAt: String?,
-    @SerializedName("updated_at") val updatedAt: String?
+    @SerializedName("updated_at") val updatedAt: String?,
+    @SerializedName("is_public") val isPublic: Boolean = false  
 )
 
 data class MustVisitPlaceDetailDto(
@@ -129,7 +133,8 @@ data class MustVisitPlaceDetailDto(
     @SerializedName("coordinates") val coordinates: CoordinatesDto?,
     @SerializedName("notes") val notes: String?,
     @SerializedName("source") val source: String,
-    @SerializedName("opening_hours") val openingHours: Map<String, String>?
+    @SerializedName("opening_hours") val openingHours: Map<String, String>?,
+    @SerializedName("image") val image: String?
 )
 
 data class RouteStatsDto(

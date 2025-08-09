@@ -23,6 +23,7 @@ import com.zeynekurtulus.wayfare.utils.ApiResult
 import com.zeynekurtulus.wayfare.utils.SharedPreferencesManager
 import com.zeynekurtulus.wayfare.utils.getAppContainer
 import com.zeynekurtulus.wayfare.utils.showToast
+import com.zeynekurtulus.wayfare.R
 
 /**
  * HomeFragment - Main home screen showing destinations and trips
@@ -86,6 +87,13 @@ class HomeFragment : Fragment() {
         // Note: fetchUserRoutes() removed - ViewModel calls loadUserRoutes() automatically in init
     }
     
+    override fun onResume() {
+        super.onResume()
+        Log.d("HomeFragment", "🔄 onResume: Refreshing user routes to show latest trips")
+        // Refresh routes when user returns to home screen (e.g., after creating a trip)
+        fetchUserRoutes()
+    }
+    
     private fun setupHomeScreen() {
         // Set user name from SharedPreferences
         val username = sharedPreferencesManager.getUsername() ?: "User"
@@ -119,11 +127,11 @@ class HomeFragment : Fragment() {
     private fun setupClickListeners() {
         // View All buttons
         binding.viewAllDestinationsTextView.setOnClickListener {
-            showToast("Destinations list coming soon!")
+            navigateToAllDestinations()
         }
         
         binding.viewAllTripsTextView.setOnClickListener {
-            showToast("Trips list coming soon!")
+            navigateToMyTrips()
         }
         
         // Empty state button click
@@ -362,6 +370,24 @@ class HomeFragment : Fragment() {
         )
     }
     
+    private fun navigateToAllDestinations() {
+        Log.d("HomeFragment", "Navigating to All Destinations")
+        val fragment = AllDestinationsFragment()
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.fragmentContainer, fragment)
+            .addToBackStack("AllDestinations")
+            .commit()
+    }
+
+    private fun navigateToMyTrips() {
+        Log.d("HomeFragment", "Navigating to My Trips")
+        val fragment = MyTripsFragment()
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.fragmentContainer, fragment)
+            .addToBackStack("MyTrips")
+            .commit()
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

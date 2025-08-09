@@ -13,7 +13,8 @@ object RouteMapper {
             endDate = createRoute.endDate,
             category = createRoute.category,
             season = createRoute.season,
-            mustVisit = createRoute.mustVisit.map { mapToMustVisitPlaceDto(it) }
+            mustVisit = createRoute.mustVisit.map { mapToMustVisitPlaceDto(it) },
+            isPublic = createRoute.isPublic  
         )
     }
     
@@ -67,7 +68,8 @@ object RouteMapper {
                 mustVisit = routeDto.mustVisit.map { mapToMustVisitPlace(it) },
                 days = routeDto.days.map { mapToRouteDay(it) },
                 createdAt = routeDto.createdAt,
-                updatedAt = routeDto.updatedAt
+                updatedAt = routeDto.updatedAt,
+                isPublic = routeDto.isPublic  
             )
         } catch (e: Exception) {
             android.util.Log.e("RouteMapper", "❌ ERROR mapping RouteDto to Route: ${e.message}", e)
@@ -96,7 +98,8 @@ object RouteMapper {
             mustVisit = routeDetailDto.mustVisit.map { mapToMustVisitPlace(it) },
             days = routeDetailDto.days.map { mapToRouteDay(it) },
             createdAt = routeDetailDto.createdAt,
-            updatedAt = routeDetailDto.updatedAt
+            updatedAt = routeDetailDto.updatedAt,
+            isPublic = routeDetailDto.isPublic  
         )
     }
     
@@ -107,7 +110,21 @@ object RouteMapper {
             address = mustVisitPlace.address,
             notes = mustVisitPlace.notes,
             source = mustVisitPlace.source,
-            coordinates = mustVisitPlace.coordinates?.let { mapToCoordinatesDto(it) }
+            coordinates = mustVisitPlace.coordinates?.let { mapToCoordinatesDto(it) },
+            image = mustVisitPlace.image
+        )
+    }
+    
+    private fun mapToMustVisitPlace(mustVisitPlaceDto: MustVisitPlaceDto): MustVisitPlace {
+        return MustVisitPlace(
+            placeId = mustVisitPlaceDto.placeId,
+            placeName = mustVisitPlaceDto.placeName,
+            address = mustVisitPlaceDto.address,
+            coordinates = mustVisitPlaceDto.coordinates?.let { mapToCoordinates(it) },
+            notes = mustVisitPlaceDto.notes,
+            source = mustVisitPlaceDto.source,
+            openingHours = null, // MustVisitPlaceDto doesn't have openingHours
+            image = mustVisitPlaceDto.image
         )
     }
     
@@ -119,7 +136,8 @@ object RouteMapper {
             coordinates = mustVisitPlaceDetailDto.coordinates?.let { mapToCoordinates(it) },
             notes = mustVisitPlaceDetailDto.notes,
             source = mustVisitPlaceDetailDto.source,
-            openingHours = mustVisitPlaceDetailDto.openingHours
+            openingHours = mustVisitPlaceDetailDto.openingHours,
+            image = mustVisitPlaceDetailDto.image
         )
     }
     

@@ -30,7 +30,8 @@ data class TripCreationData(
     var interests: List<String> = emptyList(),
     var budget: String? = null,
     var travelStyle: String? = null,
-    var title: String? = null
+    var title: String? = null,
+    var isPublic: Boolean = false  // ⭐ NEW: Privacy setting for trip creation
 ) : Parcelable
 
 // Category and Season Options

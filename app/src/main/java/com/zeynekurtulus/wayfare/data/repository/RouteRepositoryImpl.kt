@@ -171,4 +171,64 @@ class RouteRepositoryImpl(
             NetworkUtils.handleApiError(e)
         }
     }
+    
+    // ⭐ NEW: Privacy toggle implementation
+    override suspend fun toggleRoutePrivacy(routeId: String, isPublic: Boolean): ApiResult<Unit> {
+        return try {
+            val token = sharedPreferencesManager.getAccessToken()
+                ?: return ApiResult.Error("User not authenticated")
+            
+            val response = routeApiService.toggleRoutePrivacy(
+                authorization = "Bearer $token",
+                routeId = routeId,
+                isPublic = isPublic
+            )
+            
+            if (response.isSuccessful) {
+                Log.d("RouteRepositoryImpl", "✅ Route privacy toggled: $routeId -> isPublic: $isPublic")
+                ApiResult.Success(Unit)
+            } else {
+                Log.e("RouteRepositoryImpl", "❌ Failed to toggle route privacy: ${response.code()}")
+                ApiResult.Error("Failed to toggle route privacy", response.code())
+            }
+        } catch (e: Exception) {
+            Log.e("RouteRepositoryImpl", "❌ Exception toggling route privacy: ${e.message}", e)
+            NetworkUtils.handleApiError(e)
+        }
+    }
+    
+    // ⭐ NEW: Advanced public route search implementation
+    override suspend fun searchPublicRoutes(searchParams: RouteSearchParams): ApiResult<List<Route>> {
+        return try {
+            val token = sharedPreferencesManager.getAccessToken()
+                ?: return ApiResult.Error("User not authenticated")
+            
+            val response = routeApiService.searchPublicRoutes(
+                authorization = "Bearer $token",
+                searchQuery = searchParams.q,
+                city = searchParams.city,
+                country = searchParams.country,
+                category = searchParams.category,
+                season = searchParams.season,
+                budget = searchParams.budget,
+                travelStyle = searchParams.travelStyle,
+                limit = searchParams.limit,
+                sortBy = searchParams.sortBy
+            )
+            
+            if (response.isSuccessful) {
+                response.body()?.let { searchResponse ->
+                    val routes = searchResponse.data.map { RouteMapper.mapToRoute(it) }
+                    Log.d("RouteRepositoryImpl", "✅ Found ${routes.size} public routes matching search criteria")
+                    ApiResult.Success(routes)
+                } ?: ApiResult.Error("Failed to search public routes")
+            } else {
+                Log.e("RouteRepositoryImpl", "❌ Failed to search public routes: ${response.code()}")
+                ApiResult.Error("Failed to search public routes", response.code())
+            }
+        } catch (e: Exception) {
+            Log.e("RouteRepositoryImpl", "❌ Exception searching public routes: ${e.message}", e)
+            NetworkUtils.handleApiError(e)
+        }
+    }
 }

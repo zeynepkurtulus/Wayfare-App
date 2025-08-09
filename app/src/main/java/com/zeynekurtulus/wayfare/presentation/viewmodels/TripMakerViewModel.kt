@@ -476,7 +476,8 @@ class TripMakerViewModel(
                     endDate = endDate,
                     category = category,
                     season = season,
-                    mustVisit = mustVisitPlaces
+                    mustVisit = mustVisitPlaces,
+                    isPublic = tripData.isPublic  // ⭐ NEW: Include privacy setting
                 )
                 
                 Log.d("TripMakerViewModel", "Creating trip with data: $createRoute")
@@ -530,6 +531,13 @@ class TripMakerViewModel(
         val currentData = _tripData.value ?: TripCreationData()
         _tripData.value = currentData.copy(title = title)
         Log.d("TripMakerViewModel", "Set trip title: $title")
+    }
+    
+    // ⭐ NEW: Set trip privacy setting
+    fun setTripPrivacy(isPublic: Boolean) {
+        val currentData = _tripData.value ?: TripCreationData()
+        _tripData.value = currentData.copy(isPublic = isPublic)
+        Log.d("TripMakerViewModel", "Set trip privacy: isPublic = $isPublic")
     }
     
     fun canProceedFromTitle(): Boolean {

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Trip calendar dots -->
+    <dimen name="trip_dot_size">6dp</dimen>
+    <dimen name="trip_dot_margin">1dp</dimen>
+</resources>

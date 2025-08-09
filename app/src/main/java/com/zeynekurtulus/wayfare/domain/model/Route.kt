@@ -22,7 +22,8 @@ data class Route(
     val mustVisit: List<MustVisitPlace>,
     val days: List<RouteDay>,
     val createdAt: String?,
-    val updatedAt: String?
+    val updatedAt: String?,
+    val isPublic: Boolean = false  
 ) : Parcelable
 
 @Parcelize
@@ -44,7 +45,8 @@ data class RouteDetail(
     val mustVisit: List<MustVisitPlace>,
     val days: List<RouteDay>,
     val createdAt: String?,
-    val updatedAt: String?
+    val updatedAt: String?,
+    val isPublic: Boolean = false  
 ) : Parcelable
 
 @Parcelize
@@ -62,7 +64,8 @@ data class MustVisitPlace(
     val coordinates: Coordinates?,
     val notes: String?,
     val source: String,
-    val openingHours: Map<String, String>?
+    val openingHours: Map<String, String>?,
+    val image: String?
 ) : Parcelable
 
 @Parcelize
@@ -93,7 +96,8 @@ data class CreateRoute(
     val endDate: String,
     val category: String,
     val season: String,
-    val mustVisit: List<MustVisitPlace> = emptyList()
+    val mustVisit: List<MustVisitPlace> = emptyList(),
+    val isPublic: Boolean = false  // ⭐ NEW FIELD - Optional, defaults to private
 )
 
 data class UpdateRoute(
@@ -104,4 +108,22 @@ data class UpdateRoute(
     val category: String?,
     val season: String?,
     val mustVisit: List<MustVisitPlace>?
+)
+
+
+data class PrivacyToggleRequest(
+    val isPublic: Boolean
+)
+
+
+data class RouteSearchParams(
+    val q: String? = null,                    // Search route titles
+    val city: String? = null,                 // Filter by city
+    val country: String? = null,              // Filter by country
+    val category: String? = null,             // Filter by category
+    val season: String? = null,               // Filter by season
+    val budget: String? = null,               // Filter by budget
+    val travelStyle: String? = null,          // Filter by travel style
+    val limit: Int = 20,                      // Max results (default: 20, max: 50)
+    val sortBy: String = "popularity"         // Sort by: "popularity", "rating", "recent", "title"
 )

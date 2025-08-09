@@ -49,6 +49,21 @@
                     android:layout_gravity="bottom"
                     android:background="@drawable/trip_card_gradient_overlay" />
 
+                <!-- Privacy Indicator -->
+                <ImageView
+                    android:id="@+id/privacyIndicator"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="top|end"
+                    android:layout_margin="8dp"
+                    android:padding="2dp"
+                    android:background="@drawable/rounded_corners_8dp"
+                    android:backgroundTint="@color/white"
+                    android:src="@drawable/ic_lock_private"
+                    android:contentDescription="Privacy indicator"
+                    app:tint="@color/text_secondary"
+                    android:visibility="visible" />
+
             </FrameLayout>
 
         </com.google.android.material.card.MaterialCardView>

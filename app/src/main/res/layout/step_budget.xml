@@ -165,7 +165,7 @@
                 android:orientation="vertical"
                 android:padding="24dp"
                 android:gravity="center"
-                android:background="@color/primary_blue_700"
+                android:background="@color/white"
                 android:minHeight="120dp">
 
                 <TextView
@@ -179,7 +179,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Medium"
-                    android:textColor="@android:color/white"
+                    android:textColor="@color/text_secondary"
                     android:textSize="18sp"
                     android:textStyle="bold"
                     android:layout_marginBottom="8dp" />
@@ -188,7 +188,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Comfortable spending with a good balance of activities"
-                    android:textColor="@android:color/white"
+                    android:textColor="@color/text_secondary"
                     android:textSize="14sp"
                     android:textAlignment="center"
                     android:lineSpacingExtra="4dp"
@@ -198,7 +198,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="$100-200 per day"
-                    android:textColor="@android:color/white"
+                    android:textColor="@color/grey_500"
                     android:textSize="12sp"
                     android:textStyle="bold" />
 

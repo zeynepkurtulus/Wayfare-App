@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="0dp"
+    android:layout_height="48dp"
+    android:layout_weight="1"
+    android:layout_margin="1dp"
+    android:background="?attr/selectableItemBackgroundBorderless">
+
+    <!-- Day Number Background -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/dayBackgroundCard"
+        android:layout_width="46dp"
+        android:layout_height="46dp"
+        android:layout_gravity="center"
+        app:cardCornerRadius="23dp"
+        app:cardElevation="0dp"
+        app:strokeWidth="0dp"
+        app:cardBackgroundColor="@android:color/transparent">
+
+        <TextView
+            android:id="@+id/dayNumberTextView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="1"
+            android:textSize="20sp"
+            android:textColor="@color/text_primary"
+            android:gravity="center"
+            android:textStyle="normal" />
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Trip Indicator Dots Container -->
+    <LinearLayout
+        android:id="@+id/tripIndicatorsContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:orientation="horizontal"
+        android:layout_marginBottom="2dp">
+        
+        <!-- Dots will be added programmatically -->
+        
+    </LinearLayout>
+
+</FrameLayout>
