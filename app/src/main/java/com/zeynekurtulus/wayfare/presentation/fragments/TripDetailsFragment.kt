@@ -21,6 +21,8 @@ import com.zeynekurtulus.wayfare.databinding.FragmentTripDetailsBinding
 import com.zeynekurtulus.wayfare.domain.model.Route
 import com.zeynekurtulus.wayfare.domain.model.RouteDetail
 import com.zeynekurtulus.wayfare.presentation.adapters.TripDetailsMustVisitAdapter
+import com.zeynekurtulus.wayfare.presentation.fragments.GiveFeedbackFragment
+import com.zeynekurtulus.wayfare.presentation.fragments.ViewFeedbackFragment
 import com.zeynekurtulus.wayfare.presentation.viewmodels.RouteListViewModel
 import com.zeynekurtulus.wayfare.utils.getAppContainer
 import com.zeynekurtulus.wayfare.utils.showToast
@@ -108,6 +110,14 @@ class TripDetailsFragment : Fragment() {
         binding.menuButton.setOnClickListener {
             Log.d("TripDetailsFragment", "Menu button clicked")
             showTripMenu()
+        }
+        
+        binding.giveFeedbackButton.setOnClickListener {
+            navigateToGiveFeedback()
+        }
+        
+        binding.viewFeedbackButton.setOnClickListener {
+            navigateToViewFeedback()
         }
     }
 
@@ -556,6 +566,28 @@ class TripDetailsFragment : Fragment() {
                 }
             }
         }
+    }
+    
+    private fun navigateToGiveFeedback() {
+        val currentRoute = route ?: return
+        Log.d("TripDetailsFragment", "Navigating to give feedback for route: ${currentRoute.title}")
+        
+        val fragment = GiveFeedbackFragment.newInstance(currentRoute)
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.fragmentContainer, fragment)
+            .addToBackStack("GiveFeedback")
+            .commit()
+    }
+    
+    private fun navigateToViewFeedback() {
+        val currentRoute = route ?: return
+        Log.d("TripDetailsFragment", "Navigating to view feedback for route: ${currentRoute.title}")
+        
+        val fragment = ViewFeedbackFragment.newInstance(currentRoute)
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.fragmentContainer, fragment)
+            .addToBackStack("ViewFeedback")
+            .commit()
     }
 
     enum class TripStatus {

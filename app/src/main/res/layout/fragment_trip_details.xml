@@ -358,6 +358,52 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical" />
 
+            <!-- Feedback Section -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Community Feedback"
+                android:textColor="@color/text_primary"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginTop="32dp"
+                android:layout_marginBottom="16dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="24dp">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/giveFeedbackButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Give Feedback"
+                    android:textColor="@android:color/white"
+                    app:backgroundTint="@color/primary_blue_700"
+                    app:cornerRadius="8dp"
+                    app:icon="@drawable/ic_rate"
+                    app:iconTint="@android:color/white"
+                    android:layout_marginEnd="8dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/viewFeedbackButton"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="View Reviews"
+                    android:textColor="@color/primary_blue_700"
+                    app:strokeColor="@color/primary_blue_700"
+                    app:cornerRadius="8dp"
+                    app:icon="@drawable/ic_reviews"
+                    app:iconTint="@color/primary_blue_700"
+                    android:layout_marginStart="8dp" />
+
+            </LinearLayout>
+
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>

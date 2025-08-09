@@ -13,10 +13,12 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.chip.Chip
+import com.zeynekurtulus.wayfare.R
 import com.zeynekurtulus.wayfare.databinding.FragmentSearchBinding
 import com.zeynekurtulus.wayfare.domain.model.Route
 import com.zeynekurtulus.wayfare.domain.model.RouteSearchParams
 import com.zeynekurtulus.wayfare.presentation.adapters.MyTripsAdapter
+import com.zeynekurtulus.wayfare.presentation.fragments.TripDetailsFragment
 import com.zeynekurtulus.wayfare.presentation.viewmodels.RouteListViewModel
 import com.zeynekurtulus.wayfare.utils.getAppContainer
 import com.zeynekurtulus.wayfare.utils.showToast
@@ -53,22 +55,18 @@ class SearchFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        Log.d("SearchFragment", "🔍 onCreateView called - Creating SearchFragment UI")
         _binding = FragmentSearchBinding.inflate(inflater, container, false)
-        Log.d("SearchFragment", "✅ SearchFragment layout inflated successfully")
         return binding.root
     }
     
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         
-        Log.d("SearchFragment", "✅ onViewCreated called - Setting up SearchFragment")
         setupRecyclerView()
         setupSearchInput()
         setupFilters()
         setupObservers()
         showEmptyState()
-        Log.d("SearchFragment", "🎉 SearchFragment setup complete!")
     }
     
     private fun setupRecyclerView() {
@@ -303,30 +301,16 @@ class SearchFragment : Fragment() {
     }
     
     private fun navigateToRouteDetails(route: Route) {
-        // TODO: Navigate to route details fragment with feedback functionality
-        // This will be implemented in the next task
-        showToast("Opening route details for: ${route.title}")
         Log.d("SearchFragment", "Navigating to route details: ${route.title}")
-    }
-    
-    override fun onAttach(context: android.content.Context) {
-        super.onAttach(context)
-        Log.d("SearchFragment", "🔗 SearchFragment onAttach called")
-    }
-    
-    override fun onResume() {
-        super.onResume()
-        Log.d("SearchFragment", "▶️ SearchFragment onResume called - Fragment is now visible")
-    }
-    
-    override fun onPause() {
-        super.onPause()
-        Log.d("SearchFragment", "⏸️ SearchFragment onPause called")
+        val fragment = TripDetailsFragment.newInstance(route)
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.fragmentContainer, fragment)
+            .addToBackStack("RouteDetails")
+            .commit()
     }
     
     override fun onDestroyView() {
         super.onDestroyView()
-        Log.d("SearchFragment", "💀 SearchFragment onDestroyView called")
         searchJob?.cancel()
         _binding = null
     }

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp"
+    android:layout_marginBottom="12dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Header with Rating and Date -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="12dp">
+
+            <!-- Star Rating -->
+            <LinearLayout
+                android:id="@+id/starRatingLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginEnd="16dp">
+
+                <ImageView
+                    android:id="@+id/star1"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_star_outline"
+                    android:layout_marginEnd="2dp"
+                    app:tint="@color/accent" />
+
+                <ImageView
+                    android:id="@+id/star2"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_star_outline"
+                    android:layout_marginEnd="2dp"
+                    app:tint="@color/accent" />
+
+                <ImageView
+                    android:id="@+id/star3"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_star_outline"
+                    android:layout_marginEnd="2dp"
+                    app:tint="@color/accent" />
+
+                <ImageView
+                    android:id="@+id/star4"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_star_outline"
+                    android:layout_marginEnd="2dp"
+                    app:tint="@color/accent" />
+
+                <ImageView
+                    android:id="@+id/star5"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_star_outline"
+                    app:tint="@color/accent" />
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <!-- Visit Date -->
+            <TextView
+                android:id="@+id/visitDateText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp"
+                tools:text="Dec 2024" />
+
+        </LinearLayout>
+
+        <!-- Comment -->
+        <TextView
+            android:id="@+id/commentText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_primary"
+            android:textSize="14sp"
+            android:lineSpacingExtra="4dp"
+            android:visibility="gone"
+            tools:text="Great route! Well planned with good timing between locations. The must-visit places were amazing and the suggested restaurants were delicious."
+            tools:visibility="visible" />
+
+        <!-- User Info -->
+        <TextView
+            android:id="@+id/userText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_secondary"
+            android:textSize="12sp"
+            android:layout_marginTop="8dp"
+            tools:text="Anonymous Traveler" />
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>
