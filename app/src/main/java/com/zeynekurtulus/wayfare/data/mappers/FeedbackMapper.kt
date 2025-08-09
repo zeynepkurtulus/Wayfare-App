@@ -43,6 +43,7 @@ object FeedbackMapper {
         return PlaceFeedback(
             feedbackId = placeFeedbackDto.feedbackId,
             userId = placeFeedbackDto.userId,
+            username = placeFeedbackDto.username,
             placeId = placeFeedbackDto.placeId,
             rating = placeFeedbackDto.rating,
             comment = placeFeedbackDto.comment,
@@ -56,6 +57,7 @@ object FeedbackMapper {
         return RouteFeedback(
             feedbackId = routeFeedbackDto.feedbackId,
             userId = routeFeedbackDto.userId,
+            username = routeFeedbackDto.username,
             routeId = routeFeedbackDto.routeId,
             rating = routeFeedbackDto.rating,
             comment = routeFeedbackDto.comment,

@@ -76,6 +76,7 @@ data class DeleteFeedbackResponse(
 data class PlaceFeedbackDto(
     @SerializedName("feedback_id") val feedbackId: String,
     @SerializedName("user_id") val userId: String,
+    @SerializedName("username") val username: String,
     @SerializedName("place_id") val placeId: String,
     @SerializedName("rating") val rating: Int,
     @SerializedName("comment") val comment: String?,
@@ -87,6 +88,7 @@ data class PlaceFeedbackDto(
 data class RouteFeedbackDto(
     @SerializedName("feedback_id") val feedbackId: String,
     @SerializedName("user_id") val userId: String,
+    @SerializedName("username") val username: String,
     @SerializedName("route_id") val routeId: String,
     @SerializedName("rating") val rating: Int,
     @SerializedName("comment") val comment: String?,

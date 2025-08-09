@@ -54,7 +54,6 @@ interface FeedbackApiService {
     
     @GET("feedback/route/{route_id}")
     suspend fun getRouteFeedback(
-        @Header("Authorization") authorization: String,
         @Path("route_id") routeId: String
     ): Response<RouteFeedbackListResponse>
     

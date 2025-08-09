@@ -7,6 +7,7 @@ import kotlinx.parcelize.Parcelize
 data class PlaceFeedback(
     val feedbackId: String,
     val userId: String,
+    val username: String,
     val placeId: String,
     val rating: Int,
     val comment: String?,
@@ -19,6 +20,7 @@ data class PlaceFeedback(
 data class RouteFeedback(
     val feedbackId: String,
     val userId: String,
+    val username: String,
     val routeId: String,
     val rating: Int,
     val comment: String?,

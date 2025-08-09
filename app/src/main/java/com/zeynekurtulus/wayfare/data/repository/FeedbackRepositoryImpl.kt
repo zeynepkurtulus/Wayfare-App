@@ -159,20 +159,35 @@ class FeedbackRepositoryImpl(
     
     override suspend fun getRouteFeedback(routeId: String): ApiResult<List<RouteFeedback>> {
         return try {
-            val token = sharedPreferencesManager.getAccessToken()
-                ?: return ApiResult.Error("User not authenticated")
+            android.util.Log.d("FeedbackRepositoryImpl", "Making API call to get feedback for route: $routeId")
             
-            val response = feedbackApiService.getRouteFeedback("Bearer $token", routeId)
+            val response = feedbackApiService.getRouteFeedback(routeId)
+            
+            android.util.Log.d("FeedbackRepositoryImpl", "API response - isSuccessful: ${response.isSuccessful}, code: ${response.code()}")
             
             if (response.isSuccessful) {
                 response.body()?.let { routeFeedbackListResponse ->
-                    val feedback = routeFeedbackListResponse.data.map { FeedbackMapper.mapToRouteFeedback(it) }
-                    ApiResult.Success(feedback)
-                } ?: ApiResult.Error("Failed to get route feedback")
+                    android.util.Log.d("FeedbackRepositoryImpl", "Response body success: ${routeFeedbackListResponse.success}, message: ${routeFeedbackListResponse.message}")
+                    android.util.Log.d("FeedbackRepositoryImpl", "Data count: ${routeFeedbackListResponse.data.size}")
+                    
+                    if (routeFeedbackListResponse.success) {
+                        val feedback = routeFeedbackListResponse.data.map { FeedbackMapper.mapToRouteFeedback(it) }
+                        ApiResult.Success(feedback)
+                    } else {
+                        android.util.Log.e("FeedbackRepositoryImpl", "API returned success=false: ${routeFeedbackListResponse.message}")
+                        ApiResult.Error("API Error: ${routeFeedbackListResponse.message}")
+                    }
+                } ?: run {
+                    android.util.Log.e("FeedbackRepositoryImpl", "Response body is null")
+                    ApiResult.Error("Failed to get route feedback - null response body")
+                }
             } else {
-                ApiResult.Error("Failed to get route feedback", response.code())
+                val errorBody = response.errorBody()?.string()
+                android.util.Log.e("FeedbackRepositoryImpl", "API error - code: ${response.code()}, error body: $errorBody")
+                ApiResult.Error("Failed to get route feedback - HTTP ${response.code()}", response.code())
             }
         } catch (e: Exception) {
+            android.util.Log.e("FeedbackRepositoryImpl", "Exception getting route feedback", e)
             NetworkUtils.handleApiError(e)
         }
     }

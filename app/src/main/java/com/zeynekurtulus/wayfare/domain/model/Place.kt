@@ -26,10 +26,15 @@ data class AutocompletePlace(
 ) : Parcelable
 
 data class SearchPlaces(
-    val query: String,
-    val city: String,
-    val category: String?,
-    val limit: Int = 20
+    val city: String,                    // REQUIRED - supports partial search
+    val category: String? = null,        // OPTIONAL - searches both 'category' and 'wayfare_category' fields
+    val budget: String? = null,          // OPTIONAL - values: "low", "medium", "high"
+    val rating: Double? = null,          // OPTIONAL - exact rating match (only if > 0)
+    val name: String? = null,            // OPTIONAL - partial name search
+    val country: String? = null,         // OPTIONAL - partial country search
+    val minRating: Double? = null,       // OPTIONAL - minimum rating filter (only if > 0)
+    val keywords: String? = null,        // OPTIONAL - text search across place descriptions
+    val limit: Int = 10                  // OPTIONAL - max results (default: 10)
 )
 
 data class AutocompletePlaces(

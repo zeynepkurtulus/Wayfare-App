@@ -9,10 +9,15 @@ data class PlacesByIdsRequest(
 )
 
 data class SearchPlacesRequest(
-    @SerializedName("query") val query: String,
-    @SerializedName("city") val city: String,
-    @SerializedName("category") val category: String?,
-    @SerializedName("limit") val limit: Int = 20
+    @SerializedName("city") val city: String,                    // REQUIRED - supports partial search
+    @SerializedName("category") val category: String?,           // OPTIONAL - searches both 'category' and 'wayfare_category' fields
+    @SerializedName("budget") val budget: String?,               // OPTIONAL - values: "low", "medium", "high"
+    @SerializedName("rating") val rating: Double?,               // OPTIONAL - exact rating match (only if > 0)
+    @SerializedName("name") val name: String?,                   // OPTIONAL - partial name search
+    @SerializedName("country") val country: String?,             // OPTIONAL - partial country search
+    @SerializedName("min_rating") val minRating: Double?,        // OPTIONAL - minimum rating filter (only if > 0)
+    @SerializedName("keywords") val keywords: String?,           // OPTIONAL - text search across place descriptions
+    @SerializedName("limit") val limit: Int = 20                 // OPTIONAL - max results (default: 10)
 )
 
 data class AutocompletePlacesRequest(

@@ -102,8 +102,16 @@ class ViewFeedbackFragment : Fragment() {
         
         feedbackViewModel.error.observe(viewLifecycleOwner, Observer { error ->
             error?.let {
-                showErrorState(it)
                 Log.e("ViewFeedbackFragment", "Error loading feedback: $it")
+                
+                // If the error indicates no feedback exists or API endpoint not found, show empty state
+                if (it.contains("404") || it.contains("not found") || it.contains("no feedback") || 
+                    it.contains("no reviews") || it.contains("Failed to get route feedback")) {
+                    Log.d("ViewFeedbackFragment", "Treating as empty feedback instead of error")
+                    showEmptyState()
+                } else {
+                    showErrorState(it)
+                }
             }
         })
     }
@@ -111,7 +119,12 @@ class ViewFeedbackFragment : Fragment() {
     private fun loadFeedback() {
         route?.let { r ->
             Log.d("ViewFeedbackFragment", "Loading feedback for route: ${r.routeId}")
+            Log.d("ViewFeedbackFragment", "Route details: title='${r.title}', city='${r.city}', isPublic=${r.isPublic}")
+            Log.d("ViewFeedbackFragment", "Route ID length: ${r.routeId.length}")
+            Log.d("ViewFeedbackFragment", "Route userId: ${r.userId}")
             feedbackViewModel.getRouteFeedback(r.routeId)
+        } ?: run {
+            Log.e("ViewFeedbackFragment", "Route object is null!")
         }
     }
     

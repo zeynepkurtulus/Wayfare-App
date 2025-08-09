@@ -54,8 +54,8 @@ class FeedbackAdapter : RecyclerView.Adapter<FeedbackAdapter.FeedbackViewHolder>
             // Set visit date
             binding.visitDateText.text = formatVisitDate(feedback.visitedOn)
             
-            // Set user info (anonymous for now)
-            binding.userText.text = "Anonymous Traveler"
+            // Set user info
+            binding.userText.text = feedback.username
         }
         
         private fun updateStarDisplay(rating: Int) {

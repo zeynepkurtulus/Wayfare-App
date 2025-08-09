@@ -59,18 +59,39 @@ class PlaceRepositoryImpl(
             val token = sharedPreferencesManager.getAccessToken()
                 ?: return ApiResult.Error("User not authenticated")
             
+            android.util.Log.d("PlaceRepositoryImpl", "Searching places with parameters:")
+            android.util.Log.d("PlaceRepositoryImpl", "  name: '${searchPlaces.name}'")
+            android.util.Log.d("PlaceRepositoryImpl", "  city: '${searchPlaces.city}'")
+            android.util.Log.d("PlaceRepositoryImpl", "  category: '${searchPlaces.category}'")
+            android.util.Log.d("PlaceRepositoryImpl", "  limit: ${searchPlaces.limit}")
+            
             val request = PlaceMapper.mapToSearchPlacesRequest(searchPlaces)
             val response = placeApiService.searchPlaces("Bearer $token", request)
             
+            android.util.Log.d("PlaceRepositoryImpl", "API response - isSuccessful: ${response.isSuccessful}, code: ${response.code()}")
+            
             if (response.isSuccessful) {
                 response.body()?.let { placesResponse ->
-                    val places = placesResponse.data.map { PlaceMapper.mapToPlace(it) }
-                    ApiResult.Success(places)
-                } ?: ApiResult.Error("Failed to search places")
+                    android.util.Log.d("PlaceRepositoryImpl", "Response body success: ${placesResponse.success}, message: ${placesResponse.message}")
+                    android.util.Log.d("PlaceRepositoryImpl", "Places count: ${placesResponse.data.size}")
+                    
+                    if (placesResponse.success) {
+                        val places = placesResponse.data.map { PlaceMapper.mapToPlace(it) }
+                        ApiResult.Success(places)
+                    } else {
+                        ApiResult.Error("API Error: ${placesResponse.message}")
+                    }
+                } ?: run {
+                    android.util.Log.e("PlaceRepositoryImpl", "Response body is null")
+                    ApiResult.Error("Failed to search places - null response body")
+                }
             } else {
-                ApiResult.Error("Failed to search places", response.code())
+                val errorBody = response.errorBody()?.string()
+                android.util.Log.e("PlaceRepositoryImpl", "API error - code: ${response.code()}, error body: $errorBody")
+                ApiResult.Error("Failed to search places - HTTP ${response.code()}", response.code())
             }
         } catch (e: Exception) {
+            android.util.Log.e("PlaceRepositoryImpl", "Exception searching places", e)
             NetworkUtils.handleApiError(e)
         }
     }

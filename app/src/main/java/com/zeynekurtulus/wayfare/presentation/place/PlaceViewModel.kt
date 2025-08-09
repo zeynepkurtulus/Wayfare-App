@@ -62,12 +62,16 @@ class PlaceViewModel(
     }
     
     fun searchPlaces(
-        query: String,
+        query: String = "",
         city: String,
         category: String? = null,
-        limit: Int = 20
+        budget: String? = null,
+        rating: Double? = null,
+        minRating: Double? = null,
+        country: String? = null,
+        limit: Int = 10
     ) {
-        if (query.isBlank()) {
+        if (city.isBlank()) {
             _places.value = emptyList()
             return
         }
@@ -81,7 +85,19 @@ class PlaceViewModel(
             _isLoading.value = true
             _error.value = null
             
-            val searchPlaces = SearchPlaces(query, city, category, limit)
+            // Map query to appropriate fields
+            val searchPlaces = SearchPlaces(
+                city = city,
+                category = category,
+                budget = budget,
+                rating = rating,
+                name = if (query.isNotBlank()) query else null,      // Use query as name search
+                keywords = if (query.isNotBlank()) query else null,  // Also use as keywords search
+                country = country,
+                minRating = minRating,
+                limit = limit
+            )
+            
             when (val result = placeRepository.searchPlaces(searchPlaces)) {
                 is ApiResult.Success -> {
                     _places.value = result.data

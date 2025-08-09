@@ -11,9 +11,14 @@ object PlaceMapper {
     
     fun mapToSearchPlacesRequest(searchPlaces: SearchPlaces): SearchPlacesRequest {
         return SearchPlacesRequest(
-            query = searchPlaces.query,
             city = searchPlaces.city,
             category = searchPlaces.category,
+            budget = searchPlaces.budget,
+            rating = searchPlaces.rating,
+            name = searchPlaces.name,
+            country = searchPlaces.country,
+            minRating = searchPlaces.minRating,
+            keywords = searchPlaces.keywords,
             limit = searchPlaces.limit
         )
     }
