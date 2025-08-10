@@ -131,10 +131,15 @@ class PlaceDetailsFragment : Fragment() {
         }
         
         // Set opening hours
+        android.util.Log.d("PlaceDetailsFragment", "Opening hours data: ${currentPlace.openingHours}")
+        android.util.Log.d("PlaceDetailsFragment", "Opening hours size: ${currentPlace.openingHours?.size}")
+        
         if (currentPlace.openingHours.isNullOrEmpty()) {
+            android.util.Log.d("PlaceDetailsFragment", "Opening hours is null or empty")
             binding.openingHoursTitle.visibility = View.GONE
             binding.openingHoursLayout.visibility = View.GONE
         } else {
+            android.util.Log.d("PlaceDetailsFragment", "Setting up opening hours with ${currentPlace.openingHours.size} entries")
             binding.openingHoursTitle.visibility = View.VISIBLE
             binding.openingHoursLayout.visibility = View.VISIBLE
             setupOpeningHours(currentPlace.openingHours)
@@ -144,24 +149,52 @@ class PlaceDetailsFragment : Fragment() {
     private fun setupOpeningHours(openingHours: Map<String, String>) {
         binding.openingHoursLayout.removeAllViews()
         
-        val dayOrder = listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
+        android.util.Log.d("PlaceDetailsFragment", "setupOpeningHours called with map: $openingHours")
         
-        dayOrder.forEach { day ->
-            val dayKey = day.lowercase()
-            val hours = openingHours[dayKey]
+        // Try different possible key formats
+        val possibleDayKeys = listOf(
+            listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"),
+            listOf("monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"),
+            listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"),
+            listOf("mon", "tue", "wed", "thu", "fri", "sat", "sun")
+        )
+        
+        // First, let's see what keys are actually in the map
+        android.util.Log.d("PlaceDetailsFragment", "Available keys in opening hours map: ${openingHours.keys}")
+        
+        var foundAnyHours = false
+        
+        // Try to find which format works
+        for (dayFormat in possibleDayKeys) {
+            android.util.Log.d("PlaceDetailsFragment", "Trying day format: $dayFormat")
             
-            if (!hours.isNullOrBlank()) {
-                val dayView = LayoutInflater.from(requireContext())
-                    .inflate(R.layout.item_opening_hours, binding.openingHoursLayout, false)
+            dayFormat.forEachIndexed { index, day ->
+                val hours = openingHours[day]
+                android.util.Log.d("PlaceDetailsFragment", "Checking '$day': '$hours'")
                 
-                val dayText = dayView.findViewById<android.widget.TextView>(R.id.dayText)
-                val hoursText = dayView.findViewById<android.widget.TextView>(R.id.hoursText)
-                
-                dayText.text = day
-                hoursText.text = hours
-                
-                binding.openingHoursLayout.addView(dayView)
+                if (!hours.isNullOrBlank()) {
+                    foundAnyHours = true
+                    val dayView = LayoutInflater.from(requireContext())
+                        .inflate(R.layout.item_opening_hours, binding.openingHoursLayout, false)
+                    
+                    val dayText = dayView.findViewById<android.widget.TextView>(R.id.dayText)
+                    val hoursText = dayView.findViewById<android.widget.TextView>(R.id.hoursText)
+                    
+                    // Use proper day name for display
+                    val dayNames = listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
+                    dayText.text = dayNames[index]
+                    hoursText.text = hours
+                    
+                    binding.openingHoursLayout.addView(dayView)
+                    android.util.Log.d("PlaceDetailsFragment", "Added view for ${dayNames[index]}: $hours")
+                }
             }
+            
+            if (foundAnyHours) break // Stop if we found a working format
+        }
+        
+        if (!foundAnyHours) {
+            android.util.Log.w("PlaceDetailsFragment", "No valid opening hours found with any day format")
         }
     }
     

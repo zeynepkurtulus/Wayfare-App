@@ -40,6 +40,8 @@ class SearchFragment : Fragment() {
     private fun setupViewPager() {
         val adapter = SearchPagerAdapter(this)
         binding.viewPager.adapter = adapter
+        // Disable off-screen page limit to prevent fragment state restoration issues
+        binding.viewPager.offscreenPageLimit = 1
     }
     
     private fun setupTabs() {
@@ -60,6 +62,8 @@ class SearchFragment : Fragment() {
     
     override fun onDestroyView() {
         super.onDestroyView()
+        // Clear ViewPager adapter to prevent fragment restoration issues
+        binding.viewPager.adapter = null
         _binding = null
     }
     
@@ -76,8 +80,9 @@ class SearchFragment : Fragment() {
     
     /**
      * ViewPager2 adapter for managing search tab fragments
+     * Using childFragmentManager for better lifecycle management
      */
-    private class SearchPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
+    private class SearchPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment.childFragmentManager, fragment.viewLifecycleOwner.lifecycle) {
         
         override fun getItemCount(): Int = 2
         

@@ -27,7 +27,7 @@ import java.util.Locale
 class MyTripsAdapter(
     private var isGridLayout: Boolean,
     private val onTripClick: (Route) -> Unit,
-    private val onMenuClick: (Route) -> Unit
+    private val onMenuClick: (Route, android.view.View) -> Unit
 ) : RecyclerView.Adapter<MyTripsAdapter.TripViewHolder>() {
 
     private var trips: List<Route> = emptyList()
@@ -100,8 +100,8 @@ class MyTripsAdapter(
                     onTripClick(trip)
                 }
                 
-                menuButton.setOnClickListener {
-                    onMenuClick(trip)
+                menuButton.setOnClickListener { view ->
+                    onMenuClick(trip, view)
                 }
             }
         }

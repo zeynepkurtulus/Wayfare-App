@@ -69,7 +69,7 @@ class SearchRoutesFragment : Fragment() {
             onTripClick = { route ->
                 navigateToRouteDetails(route)
             },
-            onMenuClick = { route ->
+            onMenuClick = { route, view ->
                 // No menu for search results
             }
         )

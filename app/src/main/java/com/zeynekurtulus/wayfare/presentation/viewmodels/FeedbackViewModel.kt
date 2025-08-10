@@ -275,6 +275,7 @@ class FeedbackViewModel(
 // States
 sealed class SubmitFeedbackState {
     object Idle : SubmitFeedbackState()
+    object Loading : SubmitFeedbackState()
     data class Success(val feedbackId: String) : SubmitFeedbackState()
     data class Error(val message: String) : SubmitFeedbackState()
 }

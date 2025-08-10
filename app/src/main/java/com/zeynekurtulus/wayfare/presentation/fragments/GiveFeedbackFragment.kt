@@ -86,6 +86,10 @@ class GiveFeedbackFragment : Fragment() {
     private fun setupObservers() {
         feedbackViewModel.submitState.observe(viewLifecycleOwner, Observer { state ->
             when (state) {
+                is com.zeynekurtulus.wayfare.presentation.viewmodels.SubmitFeedbackState.Loading -> {
+                    binding.submitFeedbackButton.isEnabled = false
+                    binding.submitFeedbackButton.text = "Submitting..."
+                }
                 is com.zeynekurtulus.wayfare.presentation.viewmodels.SubmitFeedbackState.Success -> {
                     binding.submitFeedbackButton.isEnabled = true
                     binding.submitFeedbackButton.text = "Submit Feedback"

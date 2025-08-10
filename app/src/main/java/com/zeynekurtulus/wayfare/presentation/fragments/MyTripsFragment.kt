@@ -104,7 +104,7 @@ class MyTripsFragment : Fragment() {
         tripsAdapter = MyTripsAdapter(
             isGridLayout = isGridLayout,
             onTripClick = { trip -> onTripClicked(trip) },
-            onMenuClick = { trip -> onTripMenuClicked(trip) }
+            onMenuClick = { trip, view -> onTripMenuClicked(trip, view) }
         )
 
         updateRecyclerViewLayout()
@@ -295,13 +295,13 @@ class MyTripsFragment : Fragment() {
             .commit()
     }
 
-    private fun onTripMenuClicked(trip: Route) {
+    private fun onTripMenuClicked(trip: Route, menuView: android.view.View) {
         Log.d("MyTripsFragment", "Trip menu clicked: ${trip.title}")
-        showTripOptionsMenu(trip)
+        showTripOptionsMenu(trip, menuView)
     }
     
-    private fun showTripOptionsMenu(trip: Route) {
-        val popupMenu = android.widget.PopupMenu(requireContext(), view?.findViewById(R.id.menuButton))
+    private fun showTripOptionsMenu(trip: Route, anchorView: android.view.View) {
+        val popupMenu = android.widget.PopupMenu(requireContext(), anchorView)
         popupMenu.menuInflater.inflate(R.menu.trip_options_menu, popupMenu.menu)
         
         popupMenu.setOnMenuItemClickListener { menuItem ->
