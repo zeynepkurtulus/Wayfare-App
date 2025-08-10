@@ -28,6 +28,7 @@ class BottomNavigationHandler(
 ) {
     
     // Fragment instances (lazy initialization)
+    // Note: Fragments will be recreated fresh on each tab switch to avoid ViewPager2 state restoration issues
     private var homeFragment: HomeFragment? = null
     private var calendarFragment: CalendarFragment? = null
     private var searchFragment: SearchFragment? = null
@@ -100,37 +101,39 @@ class BottomNavigationHandler(
             return // User chose to stay, don't switch tabs
         }
         
+        // Clear SearchFragment reference before every tab switch to prevent ViewPager2 issues
+        if (tab == NavigationTab.SEARCH) {
+            searchFragment = null
+        }
+        
         val fragment = when (tab) {
             NavigationTab.HOME -> {
-                if (homeFragment == null) {
+                if (homeFragment == null || homeFragment?.isDetached == true) {
                     homeFragment = HomeFragment()
                 }
                 homeFragment!!
             }
             NavigationTab.CALENDAR -> {
-                if (calendarFragment == null) {
+                if (calendarFragment == null || calendarFragment?.isDetached == true) {
                     calendarFragment = CalendarFragment()
                 }
                 calendarFragment!!
             }
             NavigationTab.SEARCH -> {
                 android.util.Log.d("BottomNavigationHandler", "🔍 Creating/Getting SearchFragment")
-                if (searchFragment == null) {
-                    android.util.Log.d("BottomNavigationHandler", "✨ Creating NEW SearchFragment instance")
-                    searchFragment = SearchFragment()
-                } else {
-                    android.util.Log.d("BottomNavigationHandler", "♻️ Reusing existing SearchFragment")
-                }
+                // ALWAYS create a new SearchFragment to completely avoid ViewPager2 state restoration issues
+                android.util.Log.d("BottomNavigationHandler", "✨ Creating FRESH SearchFragment instance")
+                searchFragment = SearchFragment()
                 searchFragment!!
             }
             NavigationTab.TRIP_MAKER -> {
-                if (tripMakerFragment == null) {
+                if (tripMakerFragment == null || tripMakerFragment?.isDetached == true) {
                     tripMakerFragment = TripMakerFragment()
                 }
                 tripMakerFragment!!
             }
             NavigationTab.PROFILE -> {
-                if (profileFragment == null) {
+                if (profileFragment == null || profileFragment?.isDetached == true) {
                     profileFragment = ProfileFragment()
                 }
                 profileFragment!!
@@ -448,5 +451,18 @@ class BottomNavigationHandler(
         dialog.window?.setDimAmount(0.6f) // Dim the background
         
         dialog.show()
+    }
+    
+    /**
+     * Clear all fragment references to prevent ViewPager2 state restoration issues
+     * Call this when the activity is recreated or when fragments become invalid
+     */
+    fun clearFragmentReferences() {
+        android.util.Log.d("BottomNavigationHandler", "🧹 Clearing all fragment references")
+        homeFragment = null
+        calendarFragment = null
+        searchFragment = null
+        tripMakerFragment = null
+        profileFragment = null
     }
 }

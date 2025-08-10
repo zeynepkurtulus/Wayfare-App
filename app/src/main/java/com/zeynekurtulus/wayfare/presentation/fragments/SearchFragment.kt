@@ -37,11 +37,18 @@ class SearchFragment : Fragment() {
         setupTabs()
     }
     
+    override fun onSaveInstanceState(outState: Bundle) {
+        // Don't save instance state to prevent ViewPager2 restoration issues
+        // super.onSaveInstanceState(outState) - commented out intentionally
+    }
+    
     private fun setupViewPager() {
         val adapter = SearchPagerAdapter(this)
         binding.viewPager.adapter = adapter
         // Disable off-screen page limit to prevent fragment state restoration issues
         binding.viewPager.offscreenPageLimit = 1
+        // Disable state saving for ViewPager2 to prevent restoration crashes
+        binding.viewPager.isSaveEnabled = false
     }
     
     private fun setupTabs() {

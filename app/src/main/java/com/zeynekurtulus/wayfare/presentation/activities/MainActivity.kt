@@ -39,6 +39,11 @@ class MainActivity : AppCompatActivity() {
         
         setupMainActivity()
         setupBottomNavigation()
+        
+        // Clear fragment references if this is a recreation to prevent ViewPager2 issues
+        if (savedInstanceState != null) {
+            bottomNavigationHandler.clearFragmentReferences()
+        }
     }
     
     private fun setupMainActivity() {
