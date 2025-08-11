@@ -130,7 +130,9 @@ class UserProfileViewModel(
     }
     
     fun logout() {
-        userRepository.logout()
+        viewModelScope.launch {
+            userRepository.logout()
+        }
     }
     
     fun getStoredUsername(): String? {

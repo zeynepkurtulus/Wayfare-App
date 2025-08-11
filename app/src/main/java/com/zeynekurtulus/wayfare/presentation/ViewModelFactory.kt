@@ -14,6 +14,8 @@ import com.zeynekurtulus.wayfare.presentation.viewmodels.PlaceViewModel
 import com.zeynekurtulus.wayfare.presentation.viewmodels.RouteDetailViewModel
 import com.zeynekurtulus.wayfare.presentation.viewmodels.RouteListViewModel
 import com.zeynekurtulus.wayfare.presentation.viewmodels.UserProfileViewModel
+import com.zeynekurtulus.wayfare.presentation.viewmodels.OfflineRouteViewModel
+import com.zeynekurtulus.wayfare.utils.NetworkConnectivityManager
 
 /**
  * Factory for creating ViewModels with proper dependencies
@@ -25,7 +27,8 @@ class ViewModelFactory(
     private val locationRepository: LocationRepository,
     private val feedbackRepository: FeedbackRepository,
     private val cityRepository: CityRepository,
-    private val mustVisitRepository: MustVisitRepository
+    private val mustVisitRepository: MustVisitRepository,
+    private val networkConnectivityManager: NetworkConnectivityManager
 ) : ViewModelProvider.Factory {
     
     @Suppress("UNCHECKED_CAST")
@@ -42,6 +45,7 @@ class ViewModelFactory(
             PlaceViewModel::class.java -> PlaceViewModel(placeRepository) as T
             LocationViewModel::class.java -> LocationViewModel(locationRepository) as T
             FeedbackViewModel::class.java -> FeedbackViewModel(feedbackRepository) as T
+            OfflineRouteViewModel::class.java -> OfflineRouteViewModel(routeRepository, networkConnectivityManager) as T
             else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }
     }

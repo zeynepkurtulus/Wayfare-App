@@ -16,7 +16,9 @@ import com.zeynekurtulus.wayfare.presentation.activities.Trip
 
 class TripsAdapter(
     private var trips: List<Trip>,
-    private val onTripClick: (Trip) -> Unit
+    private val onTripClick: (Trip) -> Unit,
+    private val onDownloadClick: ((Trip) -> Unit)? = null,
+    private val isRouteDownloaded: ((String) -> Boolean)? = null
 ) : RecyclerView.Adapter<TripsAdapter.TripViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TripViewHolder {
@@ -64,6 +66,9 @@ class TripsAdapter(
                 binding.privacyIndicator.setColorFilter(binding.root.context.getColor(R.color.text_secondary))
             }
 
+            // Set download status indicator
+            setupDownloadIndicator(trip)
+
             if (trip.imageUrl.isNotEmpty()) {
                 Log.d("TripsAdapter", "Görsel yükleniyor: ${trip.imageUrl}")
                 Glide.with(binding.root.context)
@@ -97,6 +102,33 @@ class TripsAdapter(
             } else {
                 Log.w("TripsAdapter", "Görsel URL boş, placeholder gösteriliyor.")
                 binding.tripImageView.setImageResource(R.drawable.ic_placeholder_image)
+            }
+        }
+
+        private fun setupDownloadIndicator(trip: Trip) {
+            binding.downloadStatusIndicator.apply {
+                // Only show download functionality if trip has routeId and callbacks are provided
+                if (trip.routeId.isNotEmpty()) {
+                    val isDownloaded = isRouteDownloaded?.invoke(trip.routeId) ?: false
+                    if (isDownloaded) {
+                        visibility = android.view.View.VISIBLE
+                        setImageResource(R.drawable.ic_offline)
+                        setColorFilter(binding.root.context.getColor(R.color.secondary_green))
+                        contentDescription = "Downloaded for offline"
+                    } else if (onDownloadClick != null) {
+                        visibility = android.view.View.VISIBLE
+                        setImageResource(R.drawable.ic_download)
+                        setColorFilter(binding.root.context.getColor(R.color.text_hint))
+                        contentDescription = "Download for offline"
+                        setOnClickListener {
+                            onDownloadClick?.invoke(trip)
+                        }
+                    } else {
+                        visibility = android.view.View.GONE
+                    }
+                } else {
+                    visibility = android.view.View.GONE
+                }
             }
         }
     }

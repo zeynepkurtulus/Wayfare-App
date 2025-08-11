@@ -27,7 +27,9 @@ import java.util.Locale
 class MyTripsAdapter(
     private var isGridLayout: Boolean,
     private val onTripClick: (Route) -> Unit,
-    private val onMenuClick: (Route, android.view.View) -> Unit
+    private val onMenuClick: (Route, android.view.View) -> Unit,
+    private val onDownloadClick: ((Route) -> Unit)? = null,
+    private val isRouteDownloaded: ((String) -> Boolean)? = null
 ) : RecyclerView.Adapter<MyTripsAdapter.TripViewHolder>() {
 
     private var trips: List<Route> = emptyList()
@@ -92,6 +94,9 @@ class MyTripsAdapter(
                 // Set privacy indicator
                 setupPrivacyIndicator(trip)
                 
+                // Set download status indicator
+                setupDownloadIndicator(trip)
+                
                 // Load trip image
                 loadTripImage(trip)
                 
@@ -102,6 +107,13 @@ class MyTripsAdapter(
                 
                 menuButton.setOnClickListener { view ->
                     onMenuClick(trip, view)
+                }
+                
+                // Set download click listener if available
+                onDownloadClick?.let { downloadCallback ->
+                    downloadStatusIndicator.setOnClickListener {
+                        downloadCallback(trip)
+                    }
                 }
             }
         }
@@ -141,6 +153,26 @@ class MyTripsAdapter(
                 } else {
                     setImageResource(R.drawable.ic_lock_private)
                     setColorFilter(binding.root.context.getColor(R.color.text_hint))
+                }
+            }
+        }
+        
+        private fun setupDownloadIndicator(trip: Route) {
+            binding.downloadStatusIndicator.apply {
+                val isDownloaded = isRouteDownloaded?.invoke(trip.routeId) ?: false
+                if (isDownloaded) {
+                    visibility = android.view.View.VISIBLE
+                    setImageResource(R.drawable.ic_offline)
+                    setColorFilter(binding.root.context.getColor(R.color.secondary_green))
+                    contentDescription = "Downloaded for offline"
+                } else if (onDownloadClick != null) {
+                    // Show download option only if download callback is provided
+                    visibility = android.view.View.VISIBLE
+                    setImageResource(R.drawable.ic_download)
+                    setColorFilter(binding.root.context.getColor(R.color.text_hint))
+                    contentDescription = "Download for offline"
+                } else {
+                    visibility = android.view.View.GONE
                 }
             }
         }

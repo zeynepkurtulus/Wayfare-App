@@ -70,5 +70,12 @@ class MainActivity : AppCompatActivity() {
     fun switchToTripMaker() {
         bottomNavigationHandler.switchToTab(BottomNavigationHandler.NavigationTab.TRIP_MAKER)
     }
+    
+    /**
+     * Public method to switch to Profile tab from other fragments
+     */
+    fun switchToProfile() {
+        bottomNavigationHandler.switchToTab(BottomNavigationHandler.NavigationTab.PROFILE)
+    }
 
 }

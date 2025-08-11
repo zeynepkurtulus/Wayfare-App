@@ -27,7 +27,7 @@ interface UserRepository {
     
     fun isLoggedIn(): Boolean
     
-    fun logout()
+    suspend fun logout()
     
     fun getStoredUserId(): String?
     

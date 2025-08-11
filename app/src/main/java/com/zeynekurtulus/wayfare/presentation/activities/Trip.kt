@@ -9,5 +9,6 @@ package com.zeynekurtulus.wayfare.presentation.activities
 data class Trip(
     val name: String,
     val imageUrl: String,
-    val isPublic: Boolean = false  // Privacy indicator for UI
+    val isPublic: Boolean = false,  // Privacy indicator for UI
+    val routeId: String = ""  // Route ID for download functionality
 )

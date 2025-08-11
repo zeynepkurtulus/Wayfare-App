@@ -168,6 +168,17 @@
                 android:textColor="@color/primary_blue_700"
                 tools:text="Upcoming" />
 
+            <!-- Download Status Indicator -->
+            <ImageView
+                android:id="@+id/downloadStatusIndicator"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_offline"
+                app:tint="@color/secondary_green"
+                android:contentDescription="Downloaded for offline"
+                android:visibility="gone"
+                android:layout_marginTop="4dp" />
+
             <!-- Action Menu Button -->
             <ImageButton
                 android:id="@+id/menuButton"
@@ -177,7 +188,7 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 app:tint="@color/text_hint"
                 android:contentDescription="Trip options"
-                android:layout_marginTop="8dp" />
+                android:layout_marginTop="4dp" />
 
         </LinearLayout>
 

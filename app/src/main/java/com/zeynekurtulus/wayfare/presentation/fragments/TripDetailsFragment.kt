@@ -12,7 +12,9 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import kotlinx.coroutines.launch
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
@@ -24,8 +26,13 @@ import com.zeynekurtulus.wayfare.presentation.adapters.TripDetailsMustVisitAdapt
 import com.zeynekurtulus.wayfare.presentation.fragments.GiveFeedbackFragment
 import com.zeynekurtulus.wayfare.presentation.fragments.ViewFeedbackFragment
 import com.zeynekurtulus.wayfare.presentation.viewmodels.RouteListViewModel
+import com.zeynekurtulus.wayfare.presentation.viewmodels.OfflineRouteViewModel
+import com.zeynekurtulus.wayfare.presentation.viewmodels.DownloadProgress
 import com.zeynekurtulus.wayfare.utils.getAppContainer
 import com.zeynekurtulus.wayfare.utils.showToast
+import com.zeynekurtulus.wayfare.utils.BeautifulDialogUtils
+import com.zeynekurtulus.wayfare.presentation.fragments.OfflineDownloadsFragment
+import com.zeynekurtulus.wayfare.presentation.activities.MainActivity
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -45,6 +52,10 @@ class TripDetailsFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val routeListViewModel: RouteListViewModel by viewModels {
+        requireActivity().getAppContainer().viewModelFactory
+    }
+    
+    private val offlineRouteViewModel: OfflineRouteViewModel by viewModels {
         requireActivity().getAppContainer().viewModelFactory
     }
 
@@ -107,6 +118,11 @@ class TripDetailsFragment : Fragment() {
             shareTrip()
         }
 
+        binding.downloadButton.setOnClickListener {
+            Log.d("TripDetailsFragment", "Download button clicked")
+            route?.let { onDownloadClicked(it) }
+        }
+
         binding.menuButton.setOnClickListener {
             Log.d("TripDetailsFragment", "Menu button clicked")
             showTripMenu()
@@ -136,6 +152,52 @@ class TripDetailsFragment : Fragment() {
     private fun setupObservers() {
         // For now, we'll only use the route data passed directly
         // Future: Add route detail fetching if needed
+        
+        // Observe download progress using StateFlow
+        viewLifecycleOwner.lifecycleScope.launch {
+            offlineRouteViewModel.downloadProgress.collect { progressMap ->
+                progressMap.forEach { (routeId: String, progress: DownloadProgress) ->
+                    when (progress) {
+                        is DownloadProgress.Completed -> {
+                            val routeName = route?.title ?: "Trip"
+                            if (route?.routeId == routeId) {
+                                BeautifulDialogUtils.showDownloadSuccessDialog(
+                                    context = requireContext(),
+                                    tripName = routeName,
+                                    onViewOfflineDownloads = { navigateToOfflineDownloads() }
+                                )
+                                Log.d("TripDetailsFragment", "✅ Download completed: $routeName")
+                                // Update the download button appearance
+                                route?.let { setupDownloadButton(it) }
+                            }
+                        }
+                        is DownloadProgress.Failed -> {
+                            val routeName = route?.title ?: "Trip"
+                            if (route?.routeId == routeId) {
+                                BeautifulDialogUtils.showDownloadFailureDialog(
+                                    context = requireContext(),
+                                    tripName = routeName,
+                                    errorMessage = progress.error,
+                                    onRetry = { 
+                                        // Retry download for this route
+                                        route?.let { offlineRouteViewModel.downloadRoute(it.routeId) }
+                                    }
+                                )
+                                Log.e("TripDetailsFragment", "❌ Download failed: $routeName - ${progress.error}")
+                            }
+                        }
+                        else -> { /* Handle other states if needed */ }
+                    }
+                }
+            }
+        }
+        
+        // Observe downloaded routes changes to update download button
+        offlineRouteViewModel.downloadedRoutes.observe(viewLifecycleOwner) { downloadedRoutes ->
+            // Update the download button appearance if this route's status changed
+            route?.let { setupDownloadButton(it) }
+            Log.d("TripDetailsFragment", "🔄 Downloaded routes updated, refreshing download button")
+        }
     }
 
     private fun loadTripData() {
@@ -175,6 +237,9 @@ class TripDetailsFragment : Fragment() {
 
             // Privacy indicator
             setupPrivacyIndicator(route.isPublic)
+            
+            // Download button setup
+            setupDownloadButton(route)
 
             // Trip info cards
             datesText.text = formatDateRange(route.startDate, route.endDate)
@@ -612,10 +677,59 @@ class TripDetailsFragment : Fragment() {
             .commit()
     }
 
+    private fun setupDownloadButton(route: Route) {
+        val isDownloaded = offlineRouteViewModel.isRouteDownloaded(route.routeId)
+        binding.downloadButton.apply {
+            if (isDownloaded) {
+                visibility = View.VISIBLE
+                setImageResource(R.drawable.ic_offline)
+                setColorFilter(requireContext().getColor(R.color.secondary_green))
+                contentDescription = "Downloaded for offline"
+            } else {
+                visibility = View.VISIBLE
+                setImageResource(R.drawable.ic_download)
+                setColorFilter(requireContext().getColor(R.color.text_hint))
+                contentDescription = "Download for offline"
+            }
+        }
+    }
+    
+    private fun onDownloadClicked(route: Route) {
+        val isDownloaded = offlineRouteViewModel.isRouteDownloaded(route.routeId)
+        
+        if (isDownloaded) {
+            // Route is already downloaded, show success message
+            BeautifulDialogUtils.showDownloadSuccessDialog(
+                context = requireContext(),
+                tripName = route.title,
+                onViewOfflineDownloads = { navigateToOfflineDownloads() }
+            )
+        } else {
+            // Download the route
+            offlineRouteViewModel.downloadRoute(route.routeId)
+            Log.d("TripDetailsFragment", "🔽 Downloading trip: ${route.title} (${route.routeId})")
+            
+            // Update button appearance immediately
+            setupDownloadButton(route)
+        }
+    }
+
     enum class TripStatus {
         UPCOMING, ONGOING, COMPLETED
     }
 
+    private fun navigateToOfflineDownloads() {
+        // First switch to Profile tab in bottom navigation
+        (activity as? MainActivity)?.switchToProfile()
+        
+        // Then navigate to offline downloads fragment
+        val fragment = OfflineDownloadsFragment()
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.fragmentContainer, fragment)
+            .addToBackStack("OfflineDownloads")
+            .commit()
+    }
+    
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

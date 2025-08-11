@@ -127,6 +127,17 @@
                 app:tint="@color/text_hint"
                 android:visibility="visible" />
 
+            <!-- Download Status Indicator -->
+            <ImageView
+                android:id="@+id/downloadStatusIndicator"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_marginTop="4dp"
+                android:src="@drawable/ic_download"
+                android:contentDescription="Download for offline"
+                app:tint="@color/text_hint"
+                android:visibility="gone" />
+
         </LinearLayout>
 
     </LinearLayout>

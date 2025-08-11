@@ -8,7 +8,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import kotlinx.coroutines.launch
 import com.zeynekurtulus.wayfare.databinding.FragmentHomeBinding
 import com.zeynekurtulus.wayfare.domain.model.Route
 import com.zeynekurtulus.wayfare.domain.model.TopRatedPlace
@@ -16,16 +18,21 @@ import com.zeynekurtulus.wayfare.presentation.activities.Destination
 import com.zeynekurtulus.wayfare.presentation.activities.Trip
 import com.zeynekurtulus.wayfare.presentation.fragments.DestinationDetailsFragment
 import com.zeynekurtulus.wayfare.presentation.fragments.TripDetailsFragment
+import com.zeynekurtulus.wayfare.presentation.fragments.OfflineDownloadsFragment
 import com.zeynekurtulus.wayfare.presentation.adapters.DestinationsAdapter
 import com.zeynekurtulus.wayfare.presentation.adapters.TripsAdapter
 import com.zeynekurtulus.wayfare.presentation.navigation.BottomNavigationHandler.NavigationTab
 import com.zeynekurtulus.wayfare.presentation.viewmodels.RouteListViewModel
 import com.zeynekurtulus.wayfare.presentation.viewmodels.PlaceViewModel
+import com.zeynekurtulus.wayfare.presentation.viewmodels.OfflineRouteViewModel
+import com.zeynekurtulus.wayfare.presentation.viewmodels.DownloadProgress
 import com.zeynekurtulus.wayfare.utils.ApiResult
 import com.zeynekurtulus.wayfare.utils.SharedPreferencesManager
 import com.zeynekurtulus.wayfare.utils.getAppContainer
 import com.zeynekurtulus.wayfare.utils.showToast
+import com.zeynekurtulus.wayfare.utils.BeautifulDialogUtils
 import com.zeynekurtulus.wayfare.R
+import com.zeynekurtulus.wayfare.presentation.activities.MainActivity
 
 /**
  * HomeFragment - Main home screen showing destinations and trips
@@ -49,6 +56,11 @@ class HomeFragment : Fragment() {
     
     // ViewModel for fetching top rated places
     private val placeViewModel: PlaceViewModel by viewModels {
+        requireActivity().getAppContainer().viewModelFactory
+    }
+    
+    // ViewModel for offline route management
+    private val offlineRouteViewModel: OfflineRouteViewModel by viewModels {
         requireActivity().getAppContainer().viewModelFactory
     }
     
@@ -118,9 +130,12 @@ class HomeFragment : Fragment() {
         
         // Setup trips RecyclerView for horizontal scrolling
         val tripsLayoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-        tripsAdapter = TripsAdapter(emptyList()) { trip ->
-            onTripClicked(trip)
-        }
+        tripsAdapter = TripsAdapter(
+            trips = emptyList(),
+            onTripClick = { trip -> onTripClicked(trip) },
+            onDownloadClick = { trip -> onTripDownloadClicked(trip) },
+            isRouteDownloaded = { routeId -> offlineRouteViewModel.isRouteDownloaded(routeId) }
+        )
         binding.tripsRecyclerView.apply {
             layoutManager = tripsLayoutManager
             adapter = tripsAdapter
@@ -192,6 +207,28 @@ class HomeFragment : Fragment() {
         }
     }
     
+    private fun onTripDownloadClicked(trip: Trip) {
+        if (trip.routeId.isEmpty()) {
+            Log.w("HomeFragment", "⚠️ Cannot download trip without route ID: ${trip.name}")
+            return
+        }
+        
+        val isDownloaded = offlineRouteViewModel.isRouteDownloaded(trip.routeId)
+        
+        if (isDownloaded) {
+            // Route is already downloaded, show success message
+            BeautifulDialogUtils.showDownloadSuccessDialog(
+                context = requireContext(),
+                tripName = trip.name,
+                onViewOfflineDownloads = { navigateToOfflineDownloads() }
+            )
+        } else {
+            // Download the route
+            offlineRouteViewModel.downloadRoute(trip.routeId)
+            Log.d("HomeFragment", "🔽 Downloading trip: ${trip.name} (${trip.routeId})")
+        }
+    }
+    
     private fun setupObservers() {
         // Observe loading state
         routeListViewModel.isLoading.observe(viewLifecycleOwner, Observer { isLoading ->
@@ -208,6 +245,50 @@ class HomeFragment : Fragment() {
             userRoutes = routes
             updateTripsUI()
         })
+        
+        // Observe download progress using StateFlow
+        viewLifecycleOwner.lifecycleScope.launch {
+            offlineRouteViewModel.downloadProgress.collect { progressMap ->
+                progressMap.forEach { (routeId: String, progress: DownloadProgress) ->
+                    when (progress) {
+                        is DownloadProgress.Completed -> {
+                            val routeName = userRoutes.find { it.routeId == routeId }?.title ?: "Trip"
+                            BeautifulDialogUtils.showDownloadSuccessDialog(
+                                context = requireContext(),
+                                tripName = routeName,
+                                onViewOfflineDownloads = { navigateToOfflineDownloads() }
+                            )
+                            Log.d("HomeFragment", "✅ Download completed: $routeName")
+                            // Refresh adapter to update download status
+                            tripsAdapter.notifyDataSetChanged()
+                        }
+                        is DownloadProgress.Failed -> {
+                            val routeName = userRoutes.find { it.routeId == routeId }?.title ?: "Trip"
+                            BeautifulDialogUtils.showDownloadFailureDialog(
+                                context = requireContext(),
+                                tripName = routeName,
+                                errorMessage = progress.error,
+                                onRetry = { 
+                                    // Find the route and retry download
+                                    userRoutes.find { it.routeId == routeId }?.let { route ->
+                                        offlineRouteViewModel.downloadRoute(route.routeId)
+                                    }
+                                }
+                            )
+                            Log.e("HomeFragment", "❌ Download failed: $routeName - ${progress.error}")
+                        }
+                        else -> { /* Handle other states if needed */ }
+                    }
+                }
+            }
+        }
+        
+        // Observe downloaded routes changes to refresh adapter
+        offlineRouteViewModel.downloadedRoutes.observe(viewLifecycleOwner) { downloadedRoutes ->
+            // Refresh adapter to update download status indicators
+            tripsAdapter.notifyDataSetChanged()
+            Log.d("HomeFragment", "🔄 Downloaded routes updated, refreshing adapter")
+        }
         
         // Observe errors
         routeListViewModel.error.observe(viewLifecycleOwner, Observer { error ->
@@ -296,7 +377,9 @@ class HomeFragment : Fragment() {
                 
                 Trip(
                     name = route.title,
-                    imageUrl = imageUrl
+                    imageUrl = imageUrl,
+                    isPublic = route.isPublic,
+                    routeId = route.routeId
                 )
             }
             Log.i("HomeFragment", "✅ ADAPTER UPDATE: Updating adapter with ${trips.size} trips")
@@ -434,6 +517,18 @@ class HomeFragment : Fragment() {
         parentFragmentManager.beginTransaction()
             .replace(R.id.fragmentContainer, fragment)
             .addToBackStack("TripDetails")
+            .commit()
+    }
+    
+    private fun navigateToOfflineDownloads() {
+        // First switch to Profile tab in bottom navigation
+        (activity as? MainActivity)?.switchToProfile()
+        
+        // Then navigate to offline downloads fragment
+        val fragment = OfflineDownloadsFragment()
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.fragmentContainer, fragment)
+            .addToBackStack("OfflineDownloads")
             .commit()
     }
 

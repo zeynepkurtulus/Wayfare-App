@@ -80,6 +80,12 @@ class ProfileFragment : Fragment() {
                 navigateToChangePassword()
             }
             
+            // Offline Downloads
+            offlineDownloadsLayout.setOnClickListener {
+                Log.d("ProfileFragment", "Offline downloads clicked")
+                navigateToOfflineDownloads()
+            }
+            
             // Account Management
             accountManagementLayout.setOnClickListener {
                 Log.d("ProfileFragment", "Account management clicked")
@@ -235,6 +241,23 @@ class ProfileFragment : Fragment() {
                 requireContext(),
                 "Navigation Error",
                 "Could not open change password screen. This feature may not be implemented yet."
+            )
+        }
+    }
+    
+    private fun navigateToOfflineDownloads() {
+        try {
+            val offlineDownloadsFragment = OfflineDownloadsFragment()
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.fragmentContainer, offlineDownloadsFragment)
+                .addToBackStack("OfflineDownloads")
+                .commit()
+        } catch (e: Exception) {
+            Log.e("ProfileFragment", "Error navigating to OfflineDownloads: ${e.message}")
+            DialogUtils.showErrorDialog(
+                requireContext(),
+                "Navigation Error",
+                "Could not open offline downloads screen: ${e.message}"
             )
         }
     }

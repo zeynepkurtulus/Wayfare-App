@@ -9,7 +9,9 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
+import kotlinx.coroutines.launch
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.chip.Chip
 import com.zeynekurtulus.wayfare.R
@@ -18,9 +20,15 @@ import com.zeynekurtulus.wayfare.domain.model.Route
 import com.zeynekurtulus.wayfare.presentation.adapters.MyTripsAdapter
 import com.zeynekurtulus.wayfare.presentation.navigation.BottomNavigationHandler
 import com.zeynekurtulus.wayfare.presentation.viewmodels.RouteListViewModel
+import com.zeynekurtulus.wayfare.presentation.viewmodels.OfflineRouteViewModel
+import com.zeynekurtulus.wayfare.presentation.viewmodels.DownloadProgress
 import com.zeynekurtulus.wayfare.utils.ApiResult
 import com.zeynekurtulus.wayfare.utils.getAppContainer
 import com.zeynekurtulus.wayfare.utils.showToast
+import com.zeynekurtulus.wayfare.utils.OfflineUtils
+import com.zeynekurtulus.wayfare.utils.BeautifulDialogUtils
+import com.zeynekurtulus.wayfare.presentation.fragments.OfflineDownloadsFragment
+import com.zeynekurtulus.wayfare.presentation.activities.MainActivity
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -42,6 +50,10 @@ class MyTripsFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val routeListViewModel: RouteListViewModel by viewModels {
+        requireActivity().getAppContainer().viewModelFactory
+    }
+    
+    private val offlineRouteViewModel: OfflineRouteViewModel by viewModels {
         requireActivity().getAppContainer().viewModelFactory
     }
 
@@ -104,7 +116,9 @@ class MyTripsFragment : Fragment() {
         tripsAdapter = MyTripsAdapter(
             isGridLayout = isGridLayout,
             onTripClick = { trip -> onTripClicked(trip) },
-            onMenuClick = { trip, view -> onTripMenuClicked(trip, view) }
+            onMenuClick = { trip, view -> onTripMenuClicked(trip, view) },
+            onDownloadClick = { trip -> onTripDownloadClicked(trip) },
+            isRouteDownloaded = { routeId -> offlineRouteViewModel.isRouteDownloaded(routeId) }
         )
 
         updateRecyclerViewLayout()
@@ -201,6 +215,50 @@ class MyTripsFragment : Fragment() {
         routeListViewModel.deleteState.observe(viewLifecycleOwner, Observer { state ->
             handleDeleteState(state)
         })
+        
+        // Observe download progress using StateFlow
+        viewLifecycleOwner.lifecycleScope.launch {
+            offlineRouteViewModel.downloadProgress.collect { progressMap ->
+                progressMap.forEach { (routeId: String, progress: DownloadProgress) ->
+                    when (progress) {
+                        is DownloadProgress.Completed -> {
+                            val routeName = allTrips.find { it.routeId == routeId }?.title ?: "Trip"
+                            BeautifulDialogUtils.showDownloadSuccessDialog(
+                                context = requireContext(),
+                                tripName = routeName,
+                                onViewOfflineDownloads = { navigateToOfflineDownloads() }
+                            )
+                            Log.d("MyTripsFragment", "✅ Download completed: $routeName")
+                            // Update the adapter to reflect new download status
+                            tripsAdapter.notifyDataSetChanged()
+                        }
+                        is DownloadProgress.Failed -> {
+                            val routeName = allTrips.find { it.routeId == routeId }?.title ?: "Trip"
+                            BeautifulDialogUtils.showDownloadFailureDialog(
+                                context = requireContext(),
+                                tripName = routeName,
+                                errorMessage = progress.error,
+                                onRetry = { 
+                                    // Find the route and retry download
+                                    allTrips.find { it.routeId == routeId }?.let { route ->
+                                        offlineRouteViewModel.downloadRoute(route.routeId)
+                                    }
+                                }
+                            )
+                            Log.e("MyTripsFragment", "❌ Download failed: $routeName - ${progress.error}")
+                        }
+                        else -> { /* Handle other states if needed */ }
+                    }
+                }
+            }
+        }
+        
+        // Observe downloaded routes changes to refresh adapter
+        offlineRouteViewModel.downloadedRoutes.observe(viewLifecycleOwner) { downloadedRoutes ->
+            // Refresh adapter to update download status indicators
+            tripsAdapter.notifyDataSetChanged()
+            Log.d("MyTripsFragment", "🔄 Downloaded routes updated, refreshing adapter")
+        }
     }
 
     private fun loadTrips() {
@@ -481,12 +539,42 @@ class MyTripsFragment : Fragment() {
         binding.errorMessageText.text = message
     }
 
+    private fun onTripDownloadClicked(trip: Route) {
+        val isDownloaded = offlineRouteViewModel.isRouteDownloaded(trip.routeId)
+        
+        if (isDownloaded) {
+            // Route is already downloaded, show success message
+            BeautifulDialogUtils.showDownloadSuccessDialog(
+                context = requireContext(),
+                tripName = trip.title,
+                onViewOfflineDownloads = { navigateToOfflineDownloads() }
+            )
+        } else {
+            // Download the route
+            offlineRouteViewModel.downloadRoute(trip.routeId)
+        }
+    }
+    
+    private fun navigateToOfflineDownloads() {
+        // First switch to Profile tab in bottom navigation
+        (activity as? MainActivity)?.switchToProfile()
+        
+        // Then navigate to offline downloads fragment
+        val fragment = OfflineDownloadsFragment()
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.fragmentContainer, fragment)
+            .addToBackStack("OfflineDownloads")
+            .commit()
+    }
+    
     override fun onResume() {
         super.onResume()
         // Refresh trips when returning to this screen
         loadTrips()
+        // Also refresh offline status
+        offlineRouteViewModel.loadDownloadedRoutes()
     }
-
+    
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

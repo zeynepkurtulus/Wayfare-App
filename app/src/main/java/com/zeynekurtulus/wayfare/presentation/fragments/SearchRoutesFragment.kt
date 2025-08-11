@@ -20,8 +20,10 @@ import com.zeynekurtulus.wayfare.domain.model.RouteSearchParams
 import com.zeynekurtulus.wayfare.presentation.adapters.MyTripsAdapter
 import com.zeynekurtulus.wayfare.presentation.fragments.TripDetailsFragment
 import com.zeynekurtulus.wayfare.presentation.viewmodels.RouteListViewModel
+import com.zeynekurtulus.wayfare.presentation.viewmodels.OfflineRouteViewModel
 import com.zeynekurtulus.wayfare.utils.getAppContainer
 import com.zeynekurtulus.wayfare.utils.showToast
+import com.zeynekurtulus.wayfare.utils.BeautifulDialogUtils
 import kotlinx.coroutines.*
 
 class SearchRoutesFragment : Fragment() {
@@ -30,6 +32,10 @@ class SearchRoutesFragment : Fragment() {
     private val binding get() = _binding!!
     
     private val routeListViewModel: RouteListViewModel by viewModels {
+        requireActivity().getAppContainer().viewModelFactory
+    }
+    
+    private val offlineRouteViewModel: OfflineRouteViewModel by viewModels {
         requireActivity().getAppContainer().viewModelFactory
     }
     
@@ -71,6 +77,12 @@ class SearchRoutesFragment : Fragment() {
             },
             onMenuClick = { route, view ->
                 // No menu for search results
+            },
+            onDownloadClick = { route ->
+                offlineRouteViewModel.downloadRoute(route.routeId)
+            },
+            isRouteDownloaded = { routeId ->
+                offlineRouteViewModel.isRouteDownloaded(routeId)
             }
         )
         
@@ -160,6 +172,13 @@ class SearchRoutesFragment : Fragment() {
                 Log.e("SearchRoutesFragment", "Search error: $it")
             }
         })
+        
+        // Observe downloaded routes changes to refresh adapter
+        offlineRouteViewModel.downloadedRoutes.observe(viewLifecycleOwner) { downloadedRoutes ->
+            // Refresh adapter to update download status indicators
+            searchAdapter.notifyDataSetChanged()
+            Log.d("SearchRoutesFragment", "🔄 Downloaded routes updated, refreshing adapter")
+        }
         
         binding.retryButton.setOnClickListener {
             performSearch()

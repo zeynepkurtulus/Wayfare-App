@@ -3,10 +3,12 @@ package com.zeynekurtulus.wayfare.di
 import android.content.Context
 import com.zeynekurtulus.wayfare.data.api.NetworkConfig
 import com.zeynekurtulus.wayfare.data.api.services.*
+import com.zeynekurtulus.wayfare.data.local.WayfareDatabase
 import com.zeynekurtulus.wayfare.data.repository.*
 import com.zeynekurtulus.wayfare.domain.repository.*
 import com.zeynekurtulus.wayfare.presentation.ViewModelFactory
 import com.zeynekurtulus.wayfare.utils.SharedPreferencesManager
+import com.zeynekurtulus.wayfare.utils.NetworkConnectivityManager
 import retrofit2.Retrofit
 
 /**
@@ -18,6 +20,16 @@ class AppContainer(private val context: Context) {
     // Shared Preferences Manager
     val sharedPreferencesManager: SharedPreferencesManager by lazy {
         SharedPreferencesManager(context)
+    }
+    
+    // Network Connectivity Manager
+    val networkConnectivityManager: NetworkConnectivityManager by lazy {
+        NetworkConnectivityManager(context)
+    }
+    
+    // Database instance
+    private val database: WayfareDatabase by lazy {
+        WayfareDatabase.getDatabase(context)
     }
     
     // Retrofit instance
@@ -55,12 +67,17 @@ class AppContainer(private val context: Context) {
     }
     
     // Repository implementations
-    val userRepository: UserRepository by lazy {
-        UserRepositoryImpl(userApiService, sharedPreferencesManager)
+    val routeRepository: RouteRepository by lazy {
+        RouteRepositoryImpl(
+            routeApiService, 
+            database.routeDao(), 
+            networkConnectivityManager, 
+            sharedPreferencesManager
+        )
     }
     
-    val routeRepository: RouteRepository by lazy {
-        RouteRepositoryImpl(routeApiService, sharedPreferencesManager)
+    val userRepository: UserRepository by lazy {
+        UserRepositoryImpl(userApiService, sharedPreferencesManager, routeRepository)
     }
     
     val placeRepository: PlaceRepository by lazy {
@@ -92,7 +109,8 @@ class AppContainer(private val context: Context) {
             locationRepository = locationRepository,
             feedbackRepository = feedbackRepository,
             cityRepository = cityRepository,
-            mustVisitRepository = mustVisitRepository
+            mustVisitRepository = mustVisitRepository,
+            networkConnectivityManager = networkConnectivityManager
         )
     }
 }

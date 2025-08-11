@@ -11,14 +11,22 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import kotlinx.coroutines.launch
 import com.zeynekurtulus.wayfare.R
 import com.zeynekurtulus.wayfare.databinding.FragmentCalendarBinding
 import com.zeynekurtulus.wayfare.domain.model.Route
 import com.zeynekurtulus.wayfare.presentation.adapters.CalendarTripsAdapter
 import com.zeynekurtulus.wayfare.presentation.calendar.CustomCalendarView
 import com.zeynekurtulus.wayfare.utils.getAppContainer
+import com.zeynekurtulus.wayfare.utils.showToast
+import com.zeynekurtulus.wayfare.utils.BeautifulDialogUtils
+import com.zeynekurtulus.wayfare.presentation.fragments.OfflineDownloadsFragment
+import com.zeynekurtulus.wayfare.presentation.activities.MainActivity
 import com.zeynekurtulus.wayfare.presentation.viewmodels.RouteListViewModel
+import com.zeynekurtulus.wayfare.presentation.viewmodels.OfflineRouteViewModel
+import com.zeynekurtulus.wayfare.presentation.viewmodels.DownloadProgress
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.YearMonth
@@ -35,6 +43,11 @@ class CalendarFragment : Fragment() {
     
     // ViewModel for fetching user routes
     private val routeListViewModel: RouteListViewModel by viewModels {
+        requireActivity().getAppContainer().viewModelFactory
+    }
+    
+    // ViewModel for offline route management
+    private val offlineRouteViewModel: OfflineRouteViewModel by viewModels {
         requireActivity().getAppContainer().viewModelFactory
     }
     
@@ -107,9 +120,12 @@ class CalendarFragment : Fragment() {
     }
     
     private fun setupRecyclerView() {
-        calendarTripsAdapter = CalendarTripsAdapter(emptyList()) { trip ->
-            onTripClicked(trip)
-        }
+        calendarTripsAdapter = CalendarTripsAdapter(
+            trips = emptyList(),
+            onTripClick = { trip -> onTripClicked(trip) },
+            onDownloadClick = { trip -> onTripDownloadClicked(trip) },
+            isRouteDownloaded = { routeId -> offlineRouteViewModel.isRouteDownloaded(routeId) }
+        )
         
         binding.tripEventsRecyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext())
@@ -193,6 +209,50 @@ class CalendarFragment : Fragment() {
                 showToast("Failed to load trips: $it")
             }
         })
+        
+        // Observe download progress using StateFlow
+        viewLifecycleOwner.lifecycleScope.launch {
+            offlineRouteViewModel.downloadProgress.collect { progressMap ->
+                progressMap.forEach { (routeId: String, progress: DownloadProgress) ->
+                    when (progress) {
+                        is DownloadProgress.Completed -> {
+                            val routeName = userRoutes.find { it.routeId == routeId }?.title ?: "Trip"
+                            BeautifulDialogUtils.showDownloadSuccessDialog(
+                                context = requireContext(),
+                                tripName = routeName,
+                                onViewOfflineDownloads = { navigateToOfflineDownloads() }
+                            )
+                            android.util.Log.d("CalendarFragment", "✅ Download completed: $routeName")
+                            // Update the adapter to reflect new download status
+                            calendarTripsAdapter.notifyDataSetChanged()
+                        }
+                        is DownloadProgress.Failed -> {
+                            val routeName = userRoutes.find { it.routeId == routeId }?.title ?: "Trip"
+                            BeautifulDialogUtils.showDownloadFailureDialog(
+                                context = requireContext(),
+                                tripName = routeName,
+                                errorMessage = progress.error,
+                                onRetry = { 
+                                    // Find the route and retry download
+                                    userRoutes.find { it.routeId == routeId }?.let { route ->
+                                        offlineRouteViewModel.downloadRoute(route.routeId)
+                                    }
+                                }
+                            )
+                            android.util.Log.e("CalendarFragment", "❌ Download failed: $routeName - ${progress.error}")
+                        }
+                        else -> { /* Handle other states if needed */ }
+                    }
+                }
+            }
+        }
+        
+        // Observe downloaded routes changes to refresh adapter
+        offlineRouteViewModel.downloadedRoutes.observe(viewLifecycleOwner) { downloadedRoutes ->
+            // Refresh adapter to update download status indicators
+            calendarTripsAdapter.notifyDataSetChanged()
+            android.util.Log.d("CalendarFragment", "🔄 Downloaded routes updated, refreshing adapter")
+        }
     }
     
     private fun refreshCalendarData() {
@@ -416,6 +476,35 @@ class CalendarFragment : Fragment() {
     
     private fun showToast(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+    }
+    
+    private fun onTripDownloadClicked(trip: Route) {
+        val isDownloaded = offlineRouteViewModel.isRouteDownloaded(trip.routeId)
+        
+        if (isDownloaded) {
+            // Route is already downloaded, show success message
+            BeautifulDialogUtils.showDownloadSuccessDialog(
+                context = requireContext(),
+                tripName = trip.title,
+                onViewOfflineDownloads = { navigateToOfflineDownloads() }
+            )
+        } else {
+            // Download the route
+            offlineRouteViewModel.downloadRoute(trip.routeId)
+            android.util.Log.d("CalendarFragment", "🔽 Downloading trip: ${trip.title} (${trip.routeId})")
+        }
+    }
+    
+    private fun navigateToOfflineDownloads() {
+        // First switch to Profile tab in bottom navigation
+        (activity as? MainActivity)?.switchToProfile()
+        
+        // Then navigate to offline downloads fragment
+        val fragment = OfflineDownloadsFragment()
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.fragmentContainer, fragment)
+            .addToBackStack("OfflineDownloads")
+            .commit()
     }
     
     override fun onResume() {

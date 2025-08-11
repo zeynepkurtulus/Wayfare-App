@@ -64,6 +64,21 @@
                     app:tint="@color/text_secondary"
                     android:visibility="visible" />
 
+                <!-- Download Status Indicator -->
+                <ImageView
+                    android:id="@+id/downloadStatusIndicator"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="top|start"
+                    android:layout_margin="8dp"
+                    android:padding="2dp"
+                    android:background="@drawable/rounded_corners_8dp"
+                    android:backgroundTint="@color/white"
+                    android:src="@drawable/ic_download"
+                    android:contentDescription="Download for offline"
+                    app:tint="@color/text_hint"
+                    android:visibility="gone" />
+
             </FrameLayout>
 
         </com.google.android.material.card.MaterialCardView>

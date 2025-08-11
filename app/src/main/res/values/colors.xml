@@ -64,5 +64,14 @@
     
     <!-- View All screens colors -->
     <color name="primary_blue_50">#E3F2FD</color>
+    <color name="primary_blue_600">#1976D2</color>
+    
+    <!-- Background colors -->
+    <color name="background_primary">#FFFFFF</color>
+    
+    <!-- Warning colors -->
+    <color name="warning_yellow_50">#FFFBEB</color>
+    <color name="warning_yellow_500">#F59E0B</color>
+    <color name="warning_yellow_700">#A16207</color>
 
 </resources>

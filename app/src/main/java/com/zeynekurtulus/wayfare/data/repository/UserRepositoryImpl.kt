@@ -10,7 +10,8 @@ import com.zeynekurtulus.wayfare.utils.SharedPreferencesManager
 
 class UserRepositoryImpl(
     private val userApiService: UserApiService,
-    private val sharedPreferencesManager: SharedPreferencesManager
+    private val sharedPreferencesManager: SharedPreferencesManager,
+    private val routeRepository: com.zeynekurtulus.wayfare.domain.repository.RouteRepository
 ) : UserRepository {
     
     override suspend fun register(userRegistration: UserRegistration): ApiResult<String> {
@@ -215,7 +216,16 @@ class UserRepositoryImpl(
         return sharedPreferencesManager.isLoggedIn()
     }
     
-    override fun logout() {
+    override suspend fun logout() {
+        // Clear downloaded routes for the current user before clearing session
+        try {
+            routeRepository.clearDownloadedRoutesForCurrentUser()
+        } catch (e: Exception) {
+            // Log error but don't fail logout
+            android.util.Log.e("UserRepositoryImpl", "Failed to clear downloaded routes during logout: ${e.message}")
+        }
+        
+        // Clear user session
         sharedPreferencesManager.clearUserSession()
     }
     

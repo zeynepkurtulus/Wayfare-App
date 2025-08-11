@@ -17,7 +17,9 @@ import java.time.temporal.ChronoUnit
 
 class CalendarTripsAdapter(
     private var trips: List<Route>,
-    private val onTripClick: (Route) -> Unit
+    private val onTripClick: (Route) -> Unit,
+    private val onDownloadClick: ((Route) -> Unit)? = null,
+    private val isRouteDownloaded: ((String) -> Boolean)? = null
 ) : RecyclerView.Adapter<CalendarTripsAdapter.CalendarTripViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CalendarTripViewHolder {
@@ -47,6 +49,7 @@ class CalendarTripsAdapter(
         private val tripDurationTextView: TextView = itemView.findViewById(R.id.tripDurationTextView)
         private val tripProgressIndicator: LinearProgressIndicator = itemView.findViewById(R.id.tripProgressIndicator)
         private val privacyIndicator: ImageView = itemView.findViewById(R.id.privacyIndicator)
+        private val downloadStatusIndicator: ImageView = itemView.findViewById(R.id.downloadStatusIndicator)
 
         fun bind(trip: Route) {
             // Set trip details
@@ -135,10 +138,35 @@ class CalendarTripsAdapter(
                 privacyIndicator.setImageResource(R.drawable.ic_lock_private)
                 privacyIndicator.setColorFilter(itemView.context.getColor(R.color.text_hint))
             }
+            
+            // Set download status indicator
+            setupDownloadIndicator(trip)
 
             // Set click listener
             itemView.setOnClickListener {
                 onTripClick(trip)
+            }
+        }
+
+        private fun setupDownloadIndicator(trip: Route) {
+            downloadStatusIndicator.apply {
+                val isDownloaded = isRouteDownloaded?.invoke(trip.routeId) ?: false
+                if (isDownloaded) {
+                    visibility = View.VISIBLE
+                    setImageResource(R.drawable.ic_offline)
+                    setColorFilter(itemView.context.getColor(R.color.secondary_green))
+                    contentDescription = "Downloaded for offline"
+                } else if (onDownloadClick != null) {
+                    visibility = View.VISIBLE
+                    setImageResource(R.drawable.ic_download)
+                    setColorFilter(itemView.context.getColor(R.color.text_hint))
+                    contentDescription = "Download for offline"
+                    setOnClickListener {
+                        onDownloadClick?.invoke(trip)
+                    }
+                } else {
+                    visibility = View.GONE
+                }
             }
         }
 

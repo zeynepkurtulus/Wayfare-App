@@ -2,6 +2,16 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     
     <item
+        android:id="@+id/action_download_trip"
+        android:title="Download for Offline"
+        android:icon="@drawable/ic_download" />
+    
+    <item
+        android:id="@+id/action_remove_download"
+        android:title="Remove Download"
+        android:icon="@drawable/ic_delete_outline" />
+    
+    <item
         android:id="@+id/action_share_trip"
         android:title="Share Trip"
         android:icon="@drawable/ic_share" />

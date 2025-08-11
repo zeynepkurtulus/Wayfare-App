@@ -31,6 +31,7 @@ fun AppContainer.createViewModelFactory(): ViewModelFactory {
         locationRepository = locationRepository,
         feedbackRepository = feedbackRepository,
         cityRepository = cityRepository,
-        mustVisitRepository = mustVisitRepository
+        mustVisitRepository = mustVisitRepository,
+        networkConnectivityManager = networkConnectivityManager
     )
 }
