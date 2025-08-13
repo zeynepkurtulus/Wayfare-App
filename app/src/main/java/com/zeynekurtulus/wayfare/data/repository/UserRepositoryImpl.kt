@@ -1,5 +1,6 @@
 package com.zeynekurtulus.wayfare.data.repository
 
+import android.util.Log
 import com.zeynekurtulus.wayfare.data.api.services.UserApiService
 import com.zeynekurtulus.wayfare.data.mappers.UserMapper
 import com.zeynekurtulus.wayfare.domain.model.*
@@ -21,11 +22,22 @@ class UserRepositoryImpl(
             
             if (response.isSuccessful) {
                 response.body()?.let { registerResponse ->
-                    // Save username and set user as logged in after successful registration
-                    sharedPreferencesManager.saveUsername(userRegistration.username)
-                    sharedPreferencesManager.setLoggedIn(true)
+                    // After successful registration, automatically login to get access token
+                    val loginResult = login(UserLogin(userRegistration.username, userRegistration.password))
                     
-                    ApiResult.Success(registerResponse.userId)
+                    when (loginResult) {
+                        is ApiResult.Success -> {
+                            // Login successful, access token is now saved
+                            ApiResult.Success(registerResponse.userId)
+                        }
+                        is ApiResult.Error -> {
+                            // Registration succeeded but login failed
+                            ApiResult.Error("Registration successful, but automatic login failed: ${loginResult.message}")
+                        }
+                        is ApiResult.Loading -> {
+                            ApiResult.Error("Unexpected loading state during auto-login")
+                        }
+                    }
                 } ?: ApiResult.Error("Registration failed")
             } else {
                 ApiResult.Error("Registration failed", response.code())
@@ -125,17 +137,28 @@ class UserRepositoryImpl(
             val token = sharedPreferencesManager.getAccessToken()
                 ?: return ApiResult.Error("User not authenticated")
             
+            Log.d("UserRepositoryImpl", "🗑️ DELETE USER: Attempting to delete user account")
+            Log.d("UserRepositoryImpl", "🗑️ DELETE USER: Token available: ${token.isNotEmpty()}")
+            
             val request = UserMapper.mapToDeleteUserRequest(password)
+            Log.d("UserRepositoryImpl", "🗑️ DELETE USER: Request created with password length: ${password.length}")
+            
             val response = userApiService.deleteUser("Bearer $token", request)
+            Log.d("UserRepositoryImpl", "🗑️ DELETE USER: API response - isSuccessful: ${response.isSuccessful}, code: ${response.code()}")
             
             if (response.isSuccessful) {
+                Log.d("UserRepositoryImpl", "✅ DELETE USER: Account deleted successfully")
                 // Clear user session after successful deletion
                 sharedPreferencesManager.clearUserSession()
                 ApiResult.Success(Unit)
             } else {
-                ApiResult.Error("Failed to delete user", response.code())
+                val errorBody = response.errorBody()?.string()
+                Log.e("UserRepositoryImpl", "❌ DELETE USER: Failed to delete user - HTTP ${response.code()}")
+                Log.e("UserRepositoryImpl", "❌ DELETE USER: Error body: $errorBody")
+                ApiResult.Error("Failed to delete user: ${errorBody ?: "HTTP ${response.code()}"}", response.code())
             }
         } catch (e: Exception) {
+            Log.e("UserRepositoryImpl", "❌ DELETE USER: Exception during deletion", e)
             NetworkUtils.handleApiError(e)
         }
     }

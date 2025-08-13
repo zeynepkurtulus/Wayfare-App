@@ -33,7 +33,7 @@ interface UserApiService {
         @Body request: ChangePasswordRequest
     ): Response<ApiSuccessResponse>
     
-    @DELETE("user/delete")
+    @HTTP(method = "DELETE", path = "user/delete", hasBody = true)
     suspend fun deleteUser(
         @Header("Authorization") authorization: String,
         @Body request: DeleteUserRequest

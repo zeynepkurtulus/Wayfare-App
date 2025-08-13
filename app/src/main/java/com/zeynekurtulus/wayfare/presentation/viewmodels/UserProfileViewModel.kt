@@ -1,5 +1,6 @@
 package com.zeynekurtulus.wayfare.presentation.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -112,13 +113,19 @@ class UserProfileViewModel(
             return
         }
         
+        Log.d("UserProfileViewModel", "🗑️ DELETE ACCOUNT: Starting account deletion")
+        Log.d("UserProfileViewModel", "🗑️ DELETE ACCOUNT: Password provided: ${password.isNotEmpty()}")
+        
         _isLoading.value = true
         viewModelScope.launch {
             when (val result = userRepository.deleteUser(password)) {
                 is ApiResult.Success -> {
+                    Log.d("UserProfileViewModel", "✅ DELETE ACCOUNT: Account deleted successfully")
                     _deleteAccountState.value = DeleteAccountState.Success
                 }
                 is ApiResult.Error -> {
+                    Log.e("UserProfileViewModel", "❌ DELETE ACCOUNT: Error deleting account - ${result.message}")
+                    Log.e("UserProfileViewModel", "❌ DELETE ACCOUNT: Error code: ${result.code}")
                     _deleteAccountState.value = DeleteAccountState.Error(result.message)
                 }
                 is ApiResult.Loading -> {

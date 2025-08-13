@@ -83,6 +83,9 @@ class HomeFragment : Fragment() {
     // Store original data for navigation
     private var topRatedPlaces = listOf<TopRatedPlace>()
     
+    // Track if we need to force refresh (e.g., after route creation)
+    private var needsForceRefresh = false
+    
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -107,8 +110,15 @@ class HomeFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         Log.d("HomeFragment", "🔄 onResume: Refreshing user routes to show latest trips")
-        // Refresh routes when user returns to home screen (e.g., after creating a trip)
-        fetchUserRoutes()
+        
+        if (needsForceRefresh) {
+            Log.d("HomeFragment", "🔄 FORCE REFRESH NEEDED: User likely created a new route")
+            forceRefreshUserRoutes()
+            needsForceRefresh = false
+        } else {
+            Log.d("HomeFragment", "🔄 NORMAL REFRESH: Standard data refresh")
+            fetchUserRoutes()
+        }
     }
     
     private fun setupHomeScreen() {
@@ -151,11 +161,18 @@ class HomeFragment : Fragment() {
         }
         
         binding.viewAllTripsTextView.setOnClickListener {
+            // Set flag to force refresh when user returns (they might create a route from My Trips)
+            needsForceRefresh = true
+            Log.d("HomeFragment", "🎯 MyTrips navigation: Setting force refresh flag")
             navigateToMyTrips()
         }
         
         // Empty state button click
         binding.startTripMakerButton.setOnClickListener {
+            // Set flag to force refresh when user returns (they might create a route)
+            needsForceRefresh = true
+            Log.d("HomeFragment", "🎯 TripMaker navigation: Setting force refresh flag")
+            
             // Navigate to Trip Maker
             (activity as? androidx.appcompat.app.AppCompatActivity)?.let { activity ->
                 if (activity is com.zeynekurtulus.wayfare.presentation.activities.MainActivity) {
@@ -239,8 +256,12 @@ class HomeFragment : Fragment() {
         // Observe user routes from ViewModel
         routeListViewModel.userRoutes.observe(viewLifecycleOwner, Observer { routes ->
             Log.i("HomeFragment", "✅ ROUTES RECEIVED: ${routes.size} routes from API")
-            routes.forEachIndexed { index, route ->
-                Log.d("HomeFragment", "Route $index: ${route.title} (${route.startDate} to ${route.endDate})")
+            if (routes.isEmpty()) {
+                Log.w("HomeFragment", "⚠️ NO ROUTES RECEIVED: API returned empty list")
+            } else {
+                routes.forEachIndexed { index, route ->
+                    Log.d("HomeFragment", "Route $index: ${route.title} (ID: ${route.routeId}, Start: ${route.startDate}, End: ${route.endDate}, Public: ${route.isPublic})")
+                }
             }
             userRoutes = routes
             updateTripsUI()
@@ -344,16 +365,56 @@ class HomeFragment : Fragment() {
         routeListViewModel.loadUserRoutes()
     }
     
+    private fun forceRefreshUserRoutes() {
+        Log.d("HomeFragment", "🔄 FORCE REFRESH: Clearing current data and fetching fresh routes")
+        Log.d("HomeFragment", "🔄 FORCE REFRESH: Current userRoutes count before clear: ${userRoutes.size}")
+        
+        // Clear current data first to ensure we get fresh data
+        userRoutes = emptyList()
+        updateTripsUI() // Show empty state temporarily
+        
+        Log.d("HomeFragment", "🔄 FORCE REFRESH: Calling routeListViewModel.refreshUserRoutes()")
+        // Then fetch fresh data
+        routeListViewModel.refreshUserRoutes()
+        
+        Log.d("HomeFragment", "🔄 FORCE REFRESH: refreshUserRoutes() called successfully")
+    }
+    
     // Debug method - you can call this to test the API manually
     private fun debugRefreshTrips() {
         Log.d("HomeFragment", "=== DEBUG: Manual refresh triggered ===")
-        userRoutes = emptyList()
-        updateTripsUI() // Show empty state first
-        fetchUserRoutes() // Then fetch new data
+        forceRefreshUserRoutes()
     }
     
     private fun updateTripsUI() {
         Log.d("HomeFragment", "🔄 UPDATE TRIPS UI: Starting with ${userRoutes.size} total routes")
+        
+        // TEMPORARY DEBUG: Show all trips regardless of filtering
+        if (userRoutes.isNotEmpty()) {
+            Log.w("HomeFragment", "🔧 DEBUG MODE: Showing ALL trips regardless of filtering")
+            val allTrips = userRoutes.take(4)
+            Log.i("HomeFragment", "🔧 DEBUG: Showing ${allTrips.size} total trips (bypassing filter)")
+            
+            // Show trips list
+            binding.tripsRecyclerView.visibility = View.VISIBLE
+            binding.emptyTripsStateLayout.visibility = View.GONE
+            
+            // Convert Routes to Trips for the adapter
+            val trips = allTrips.map { route ->
+                // Get the first available image from route activities (optimized)
+                val imageUrl = getFirstImageFromRoute(route)
+                
+                Trip(
+                    name = route.title,
+                    imageUrl = imageUrl,
+                    isPublic = route.isPublic,
+                    routeId = route.routeId
+                )
+            }
+            Log.i("HomeFragment", "✅ ADAPTER UPDATE: Updating adapter with ${trips.size} trips")
+            tripsAdapter.updateTrips(trips)
+            return
+        }
         
         // Filter for upcoming trips only and limit to 4
         val upcomingTrips = getUpcomingTrips(userRoutes)
@@ -392,25 +453,42 @@ class HomeFragment : Fragment() {
             val currentDate = java.time.LocalDate.now()
             Log.d("HomeFragment", "🗓️ FILTERING: Current date is $currentDate, filtering ${routes.size} routes")
             
-            val upcomingRoutes = routes.filter { route ->
+            // More inclusive filtering: show trips that are recent or upcoming
+            val recentAndUpcomingRoutes = routes.filter { route ->
                 try {
                     val startDate = java.time.LocalDate.parse(route.startDate)
+                    
+                    // Show trips that are:
+                    // 1. Starting today or in the future (upcoming)
+                    // 2. Started within the last 30 days (recent)
                     val isUpcoming = startDate.isAfter(currentDate) || startDate.isEqual(currentDate)
-                    Log.d("HomeFragment", "📅 Route '${route.title}': ${route.startDate} -> ${if (isUpcoming) "UPCOMING" else "PAST"}")
-                    isUpcoming
+                    val isRecent = startDate.isAfter(currentDate.minusDays(30))
+                    
+                    val shouldShow = isUpcoming || isRecent
+                    Log.d("HomeFragment", "📅 Route '${route.title}': ${route.startDate} -> ${if (shouldShow) "SHOW" else "HIDE"} (upcoming: $isUpcoming, recent: $isRecent)")
+                    shouldShow
                 } catch (e: Exception) {
                     Log.e("HomeFragment", "❌ DATE PARSE ERROR for route '${route.title}': ${route.startDate}", e)
-                    false // Exclude routes with invalid dates
+                    // Include routes with invalid dates as fallback
+                    true
                 }
             }
             
-            val sortedRoutes = upcomingRoutes.sortedBy { it.startDate }
-            Log.d("HomeFragment", "📊 SORTED: ${sortedRoutes.size} upcoming routes sorted by date")
+            val sortedRoutes = recentAndUpcomingRoutes.sortedBy { it.startDate }
+            Log.d("HomeFragment", "📊 SORTED: ${sortedRoutes.size} recent/upcoming routes sorted by date")
             
             val finalRoutes = sortedRoutes.take(4)
-            Log.i("HomeFragment", "🎯 FINAL RESULT: Taking top ${finalRoutes.size} upcoming trips")
+            Log.i("HomeFragment", "🎯 FINAL RESULT: Taking top ${finalRoutes.size} recent/upcoming trips")
             
-            finalRoutes
+            // If no recent/upcoming trips found, show all trips (fallback for newly created trips)
+            if (finalRoutes.isEmpty() && routes.isNotEmpty()) {
+                Log.w("HomeFragment", "⚠️ No recent/upcoming trips found, showing all trips as fallback")
+                val allRoutesSorted = routes.sortedBy { it.startDate }.take(4)
+                Log.i("HomeFragment", "🔄 FALLBACK: Showing ${allRoutesSorted.size} total trips")
+                allRoutesSorted
+            } else {
+                finalRoutes
+            }
         } catch (e: Exception) {
             Log.e("HomeFragment", "❌ FILTER ERROR: Exception during filtering", e)
             val fallback = routes.take(4)
