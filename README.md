@@ -42,7 +42,7 @@ Wayfare is a comprehensive Android travel planning application that helps users 
 - Community insights from other travelers
 - Feedback management and editing
 
-### 👤 **User Profile & Preferences**
+### **User Profile & Preferences**
 - Personalized travel preferences and categories
 - Budget preference management
 - Travel history and experiences
