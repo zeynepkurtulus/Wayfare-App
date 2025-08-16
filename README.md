@@ -5,38 +5,38 @@
   <p>Plan, discover, and share amazing travel experiences with Wayfare</p>
 </div>
 
-## 📱 Overview
+## Overview
 
 Wayfare is a comprehensive Android travel planning application that helps users discover destinations, plan personalized trips, and share travel experiences. Built with modern Android development practices using MVVM architecture, Kotlin, and Android Jetpack components.
 
-## ✨ Key Features
+## Key Features
 
-### 🏠 **Home & Discovery**
+### **Home & Discovery**
 - Top destinations with detailed information and images
 - Personalized recommendations based on user preferences
 - Quick access to recent and favorite trips
 - Trending community-generated travel routes
 
-### 🔍 **Advanced Search System**
+### **Advanced Search System**
 - Dual search tabs for routes and places
 - Smart filtering by category, budget, travel style, season, and location
 - Real-time search results with debounced input
 - Comprehensive details for each search result
 
-### ✈️ **Trip Maker**
+###  **Trip Maker**
 - Multi-step guided trip creation process
 - Interest selection (cultural, adventure, nature, beach, wellness, city break)
 - Budget planning with smart recommendations
 - Must-visit places management
 - Unsaved changes protection with warning dialogs
 
-### 📅 **Calendar & Trip Management**
+###  **Calendar & Trip Management**
 - Interactive calendar with visual trip timeline
 - Trip filtering (upcoming, ongoing, past)
 - Quick trip details on date selection
 - Trip statistics and travel patterns
 
-### 💬 **Community Feedback System**
+###  **Community Feedback System**
 - Route and place reviews with star ratings
 - Visit date tracking
 - Community insights from other travelers
@@ -48,7 +48,7 @@ Wayfare is a comprehensive Android travel planning application that helps users 
 - Travel history and experiences
 - Account settings and profile editing
 
-## 🏗️ Technical Architecture
+##  Technical Architecture
 
 ### **Architecture Pattern**
 - **MVVM (Model-View-ViewModel)**: Clean separation of concerns
@@ -93,7 +93,7 @@ app/src/main/java/com/zeynekurtulus/wayfare/
 └── utils/              # General utilities
 ```
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 - Android Studio Arctic Fox or later
@@ -123,7 +123,7 @@ app/src/main/java/com/zeynekurtulus/wayfare/
    ./gradlew assembleDebug
    ```
 
-## 🔧 Configuration
+## Configuration
 
 ### API Configuration
 Update `NetworkUtils.kt`:
@@ -134,7 +134,7 @@ object NetworkUtils {
 }
 ```
 
-## 🎨 UI/UX Features
+## UI/UX Features
 
 ### **Material Design 3**
 - Modern Material Design components
@@ -154,7 +154,7 @@ object NetworkUtils {
 - Smooth transitions between screens
 - Unsaved changes protection
 
-## 🔐 Security & Data Management
+## Security & Data Management
 
 ### **Authentication**
 - JWT token-based authentication
@@ -168,7 +168,7 @@ object NetworkUtils {
 - Automatic retry mechanisms
 - Offline mode support
 
-## 📊 Performance Optimizations
+## Performance Optimizations
 
 ### **Memory Management**
 - Efficient fragment lifecycle management
@@ -182,27 +182,14 @@ object NetworkUtils {
 - Debounced search input
 - Pagination for large datasets
 
-## 🧪 Testing Strategy
-
-### **Unit Tests**
-- ViewModel testing with LiveData
-- Repository layer testing
-- API service mocking
-- Data mapping validation
-
-### **UI Tests**
-- Fragment navigation testing
-- User interaction validation
-- Screen state verification
-
-## 🚀 Deployment
+##  Deployment
 
 ### **Release Build**
 ```bash
 ./gradlew assembleRelease
 ```
 
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch: `git checkout -b feature/amazing-feature`
@@ -216,17 +203,14 @@ object NetworkUtils {
 - Add comprehensive comments for complex logic
 - Maintain consistent formatting
 
-## 📝 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 📞 Support
+## Support
 
 For support and questions:
 - **Email**: zeynep.kurtulus@alumni.sabanciuniv.edu
 - **Issues**: [GitHub Issues](https://github.com/zeynepkurtulus/Wayfare-App/issues)
 
-## 🔄 Version History
+## Version History
 
 ### v1.0.0 (Current)
 - Initial release with core features
@@ -235,12 +219,6 @@ For support and questions:
 - Advanced search capabilities
 - Calendar integration
 
-### Upcoming Features
-- Offline mode support
-- Social sharing integration
-- Advanced analytics
-- Multi-language support
-- Dark theme support
 
 ---
 
